@@ -1,0 +1,81 @@
+@use '@/styles/variables.scss' as *;
+
+.decantPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: $spacing-md $page-padding;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.item {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.icon {
+  font-size: 48rpx;
+  margin-right: $spacing-sm;
+}
+
+.itemTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.itemContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 2;
+  white-space: pre-line;
+}
+
+.tipCard {
+  margin-top: $spacing-lg;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(212, 175, 55, 0.05) 100%);
+  border: 2rpx solid rgba(212, 175, 55, 0.3);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+}
+
+.tipTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-secondary-dark;
+  margin-bottom: $spacing-sm;
+}
+
+.tipText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 1.8;
+}

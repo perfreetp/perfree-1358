@@ -1,0 +1,277 @@
+@use '@/styles/variables.scss' as *;
+
+.pairingPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-xl});
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.banner {
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-dark 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  margin-top: $spacing-md;
+  color: $color-text-white;
+}
+
+.bannerTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.bannerDesc {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+}
+
+.section {
+  margin-bottom: $spacing-lg;
+}
+
+.foodGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+}
+
+.foodCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.foodImage {
+  width: 100%;
+  height: 200rpx;
+  background-color: $color-bg-hover;
+}
+
+.foodContent {
+  padding: $spacing-md;
+}
+
+.foodTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.foodDesc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+  @include text-ellipsis-multi(2);
+}
+
+.occasionList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.occasionCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  gap: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.occasionIcon {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, $color-bg-tag 0%, $color-bg-hover 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  flex-shrink: 0;
+}
+
+.occasionContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.occasionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.occasionDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+  @include text-ellipsis-multi(2);
+}
+
+.occasionTips {
+  margin-top: $spacing-sm;
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.giftSection {
+  margin-bottom: $spacing-lg;
+}
+
+.giftCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.giftHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.giftTarget {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.giftBudget {
+  font-size: $font-size-sm;
+  color: $color-secondary-dark;
+  font-weight: $font-weight-medium;
+}
+
+.giftItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+  border-top: 1rpx solid $color-divider;
+
+  &:first-of-type {
+    border-top: none;
+  }
+}
+
+.giftWineImage {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-sm;
+  background-color: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.giftWineInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.giftWineName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.giftWineReason {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-top: 2rpx;
+  @include text-ellipsis;
+}
+
+.giftWinePrice {
+  font-size: $font-size-sm;
+  color: $color-price;
+  font-weight: $font-weight-semibold;
+  flex-shrink: 0;
+}
+
+.knowledgeSection {
+  margin-bottom: $spacing-lg;
+}
+
+.knowledgeList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.knowledgeItem {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.knowledgeIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.knowledgeContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.knowledgeTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.knowledgeDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: 4rpx;
+  @include text-ellipsis;
+}
+
+.knowledgeArrow {
+  font-size: 32rpx;
+  color: $color-text-tertiary;
+  flex-shrink: 0;
+}

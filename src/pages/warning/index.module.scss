@@ -1,0 +1,92 @@
+@use '@/styles/variables.scss' as *;
+
+.warningPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: $spacing-md $page-padding;
+}
+
+.header {
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.banner {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+.bannerText {
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  line-height: 1.8;
+}
+
+.bannerHighlight {
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-md;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.item {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.itemHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.icon {
+  font-size: 48rpx;
+  margin-right: $spacing-sm;
+}
+
+.itemTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-primary;
+}
+
+.itemContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: 2;
+  white-space: pre-line;
+}
+
+.footer {
+  margin-top: $spacing-lg;
+  padding: $spacing-lg;
+  background-color: rgba(139, 0, 0, 0.05);
+  border-radius: $radius-lg;
+  text-align: center;
+}
+
+.footerText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: 1.6;
+}

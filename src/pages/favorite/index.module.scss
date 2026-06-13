@@ -1,0 +1,264 @@
+@use '@/styles/variables.scss' as *;
+
+.favoritePage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding-bottom: calc(env(safe-area-inset-bottom) + #{$spacing-xl});
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.tabs {
+  display: flex;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xs;
+  margin-top: $spacing-md;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.tab {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  background: transparent;
+  transition: all $transition-base;
+}
+
+.activeTab {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
+.actionBar {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.actionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background-color: $color-bg-card;
+  color: $color-text-primary;
+  font-size: $font-size-sm;
+  box-shadow: $shadow-card;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.primaryBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
+
+.wineList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.emptyState {
+  text-align: center;
+  padding: $spacing-xl * 3 $page-padding;
+}
+
+.emptyIcon {
+  font-size: 120rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.emptyHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.noteCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.noteHeader {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-sm;
+}
+
+.noteWineImage {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: $radius-md;
+  background-color: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.noteWineInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.noteWineName {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  @include text-ellipsis;
+}
+
+.noteRating {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  margin-top: 4rpx;
+}
+
+.star {
+  font-size: 28rpx;
+  color: $color-secondary;
+}
+
+.emptyStar {
+  font-size: 28rpx;
+  color: $color-border;
+}
+
+.noteContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  padding-top: $spacing-sm;
+  border-top: 1rpx solid $color-divider;
+}
+
+.noteDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: $spacing-sm;
+  text-align: right;
+}
+
+.exportModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $page-padding;
+}
+
+.exportContent {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  width: 100%;
+  max-width: 600rpx;
+}
+
+.exportTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-md;
+}
+
+.exportItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.exportItemName {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.exportItemPrice {
+  font-size: $font-size-sm;
+  color: $color-price;
+  font-weight: $font-weight-medium;
+}
+
+.exportTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+  border-top: 2rpx solid $color-primary;
+}
+
+.exportTotalLabel {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.exportTotalPrice {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+}
+
+.exportActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.exportBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  font-size: $font-size-sm;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.cancelBtn {
+  background-color: $color-bg-page;
+  color: $color-text-secondary;
+}
+
+.confirmBtn {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+}
