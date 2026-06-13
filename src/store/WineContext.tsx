@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { WineStore, RatingNote, SearchFilters } from '@/types/wine';
+import { WineStore, RatingNote, SearchFilters, ToggleCompareResult } from '@/types/wine';
 import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage';
 import { occasionOptions, peopleOptions } from '@/data/flavors';
 
@@ -77,16 +77,39 @@ export const WineProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return ratingNotes.find(n => n.wineId === wineId);
   };
 
-  const toggleCompare = (wineId: string) => {
-    setCompareList(prev => {
-      if (prev.includes(wineId)) {
-        return prev.filter(id => id !== wineId);
-      }
-      if (prev.length >= 3) {
-        return prev;
-      }
-      return [...prev, wineId];
-    });
+  const toggleCompare = (wineId: string): ToggleCompareResult => {
+    const isInList = compareList.includes(wineId);
+    
+    if (isInList) {
+      setCompareList(prev => prev.filter(id => id !== wineId));
+      return { success: true, action: 'remove', message: '已移出对比' };
+    }
+    
+    if (compareList.length >= 3) {
+      return { success: false, action: 'full', message: '对比清单已满（最多3款）' };
+    }
+    
+    setCompareList(prev => [...prev, wineId]);
+    return { success: true, action: 'add', message: '已加入对比' };
+  };
+
+  const addToCompare = (wineId: string): ToggleCompareResult => {
+    if (compareList.includes(wineId)) {
+      return { success: false, action: 'already', message: '已在对比清单中' };
+    }
+    if (compareList.length >= 3) {
+      return { success: false, action: 'full', message: '对比清单已满（最多3款）' };
+    }
+    setCompareList(prev => [...prev, wineId]);
+    return { success: true, action: 'add', message: '已加入对比' };
+  };
+
+  const removeFromCompare = (wineId: string): boolean => {
+    if (!compareList.includes(wineId)) {
+      return false;
+    }
+    setCompareList(prev => prev.filter(id => id !== wineId));
+    return true;
   };
 
   const isInCompare = (wineId: string) => {
@@ -142,6 +165,8 @@ export const WineProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     addRating,
     getRating,
     toggleCompare,
+    addToCompare,
+    removeFromCompare,
     isInCompare,
     clearCompare,
     setSearchFilters,

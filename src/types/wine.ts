@@ -97,6 +97,14 @@ export interface GiftFilters {
   occasion?: string;
 }
 
+export type CompareActionType = 'add' | 'remove' | 'full' | 'already';
+
+export interface ToggleCompareResult {
+  success: boolean;
+  action: CompareActionType;
+  message: string;
+}
+
 export interface WineStore {
   favorites: string[];
   ratingNotes: RatingNote[];
@@ -106,7 +114,9 @@ export interface WineStore {
   isFavorite: (wineId: string) => boolean;
   addRating: (note: RatingNote) => void;
   getRating: (wineId: string) => RatingNote | undefined;
-  toggleCompare: (wineId: string) => void;
+  toggleCompare: (wineId: string) => ToggleCompareResult;
+  addToCompare: (wineId: string) => ToggleCompareResult;
+  removeFromCompare: (wineId: string) => boolean;
   isInCompare: (wineId: string) => boolean;
   clearCompare: () => void;
   setSearchFilters: (filters: Partial<SearchFilters>) => void;

@@ -30,7 +30,11 @@ const WineCard: React.FC<WineCardProps> = ({ wine, showCompare = false }) => {
   const handleCompareClick = (e) => {
     e.stopPropagation();
     console.log('[WineCard] Toggling compare:', wine.id);
-    toggleCompare(wine.id);
+    const result = toggleCompare(wine.id);
+    Taro.showToast({
+      title: result.message,
+      icon: result.success ? 'success' : 'none'
+    });
   };
 
   const isFav = isFavorite(wine.id);

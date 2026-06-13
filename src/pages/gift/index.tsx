@@ -27,12 +27,20 @@ interface GiftCombo {
   total: number;
 }
 
+interface ReplaceState {
+  comboId: string;
+  wineIndex: number;
+  show: boolean;
+}
+
 const GiftPage: React.FC = () => {
   const { toggleFavorite, toggleCompare, isFavorite, isInCompare, compareList } = useWineStore();
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedBudget, setSelectedBudget] = useState('');
   const [selectedRecipient, setSelectedRecipient] = useState('');
   const [selectedOccasion, setSelectedOccasion] = useState('');
+  const [combos, setCombos] = useState<GiftCombo[]>([]);
+  const [replaceState, setReplaceState] = useState<ReplaceState>({ comboId: '', wineIndex: -1, show: false });
 
   const getBudgetRange = (budgetId: string): [number, number] => {
     switch (budgetId) {
@@ -58,88 +66,143 @@ const GiftPage: React.FC = () => {
     return '';
   };
 
-  const recommendedCombos = useMemo<GiftCombo[]>(() => {
-    if (!selectedBudget || !selectedRecipient || !selectedOccasion) {
-      return [];
-    }
+  const candidateWines = useMemo<Wine[]>(() => {
+    if (!selectedBudget) return [];
+    const [minPrice, maxPrice] = getBudgetRange(selectedBudget);
+    return wines.filter(wine => wine.price >= minPrice && wine.price <= maxPrice);
+  }, [selectedBudget]);
 
+  const getReplaceCandidates = (currentWineId: string): Wine[] => {
+    return candidateWines.filter(w => w.id !== currentWineId && !combos.some(c => c.wines.some(wine => wine.id === w.id && w.id !== currentWineId)));
+  };
+
+  const handleGenerateRecommendations = () => {
     const [minPrice, maxPrice] = getBudgetRange(selectedBudget);
     const recipientName = getOptionName('recipient', selectedRecipient);
     const occasionName = getOptionName('occasion', selectedOccasion);
 
-    const candidateWines = wines.filter(wine => {
+    const candidateWinesList = wines.filter(wine => {
       const priceMatch = wine.price >= minPrice && wine.price <= maxPrice;
       const recipientMatch = recipientName ? wine.suitableFor.includes(recipientName) : true;
       const occasionMatch = occasionName ? wine.occasions.includes(occasionName) : true;
       return priceMatch && recipientMatch && occasionMatch;
     });
 
-    if (candidateWines.length === 0) {
-      return [];
-    }
+    const newCombos: GiftCombo[] = [];
 
-    const combos: GiftCombo[] = [];
-    const sorted = [...candidateWines].sort((a, b) => b.rating - a.rating);
-
-    if (sorted.length >= 3) {
-      combos.push({
+    const sortedByRating = [...candidateWinesList].sort((a, b) => b.rating - a.rating);
+    if (sortedByRating.length >= 2) {
+      const comboWines = sortedByRating.slice(0, 2);
+      newCombos.push({
         id: 'combo1',
         name: '尊享之选',
         badge: '🎖️ 高分臻选',
-        wines: sorted.slice(0, 3),
-        total: sorted.slice(0, 3).reduce((s, w) => s + w.price, 0)
+        wines: comboWines,
+        total: comboWines.reduce((s, w) => s + w.price, 0)
       });
-    } else if (sorted.length >= 1) {
-      combos.push({
+    } else if (sortedByRating.length >= 1) {
+      newCombos.push({
         id: 'combo1',
         name: '品质之选',
         badge: '🎖️ 高分臻选',
-        wines: sorted.slice(0, 1),
-        total: sorted[0].price
+        wines: sortedByRating.slice(0, 1),
+        total: sortedByRating[0].price
       });
     }
 
-    const sortedByPopularity = [...candidateWines].sort((a, b) => {
+    const sortedByPopularity = [...candidateWinesList].sort((a, b) => {
       const scoreA = a.suitableFor.length + a.occasions.length;
       const scoreB = b.suitableFor.length + b.occasions.length;
       return scoreB - scoreA;
     });
-
-    if (sortedByPopularity.length >= 2) {
-      const unique = sortedByPopularity.filter(w => !combos[0]?.wines.includes(w));
-      if (unique.length >= 2) {
-        combos.push({
-          id: 'combo2',
-          name: '稳妥之选',
-          badge: '⭐ 人气推荐',
-          wines: unique.slice(0, 2),
-          total: unique.slice(0, 2).reduce((s, w) => s + w.price, 0)
-        });
-      } else if (unique.length >= 1) {
-        combos.push({
-          id: 'combo2',
-          name: '稳妥之选',
-          badge: '⭐ 人气推荐',
-          wines: unique.slice(0, 1),
-          total: unique[0].price
-        });
-      }
-    }
-
-    const sortedByValue = [...candidateWines].sort((a, b) => (b.rating / b.price) - (a.rating / a.price));
-    const uniqueForCombo3 = sortedByValue.filter(w => !combos.some(c => c.wines.includes(w)));
-    if (uniqueForCombo3.length >= 1) {
-      combos.push({
-        id: 'combo3',
-        name: '性价比之选',
-        badge: '💡 超值推荐',
-        wines: uniqueForCombo3.slice(0, Math.min(2, uniqueForCombo3.length)),
-        total: uniqueForCombo3.slice(0, Math.min(2, uniqueForCombo3.length)).reduce((s, w) => s + w.price, 0)
+    const usedInCombo1 = newCombos[0]?.wines.map(w => w.id) || [];
+    const uniqueForCombo2 = sortedByPopularity.filter(w => !usedInCombo1.includes(w.id));
+    if (uniqueForCombo2.length >= 2) {
+      const comboWines = uniqueForCombo2.slice(0, 2);
+      newCombos.push({
+        id: 'combo2',
+        name: '稳妥之选',
+        badge: '⭐ 人气推荐',
+        wines: comboWines,
+        total: comboWines.reduce((s, w) => s + w.price, 0)
+      });
+    } else if (uniqueForCombo2.length >= 1) {
+      newCombos.push({
+        id: 'combo2',
+        name: '稳妥之选',
+        badge: '⭐ 人气推荐',
+        wines: uniqueForCombo2.slice(0, 1),
+        total: uniqueForCombo2[0].price
       });
     }
 
-    return combos;
-  }, [selectedBudget, selectedRecipient, selectedOccasion]);
+    const sortedByValue = [...candidateWinesList].sort((a, b) => (b.rating / b.price) - (a.rating / a.price));
+    const usedIds = newCombos.flatMap(c => c.wines.map(w => w.id));
+    const uniqueForCombo3 = sortedByValue.filter(w => !usedIds.includes(w.id));
+    if (uniqueForCombo3.length >= 1) {
+      const count = Math.min(2, uniqueForCombo3.length);
+      const comboWines = uniqueForCombo3.slice(0, count);
+      newCombos.push({
+        id: 'combo3',
+        name: '性价比之选',
+        badge: '💡 超值推荐',
+        wines: comboWines,
+        total: comboWines.reduce((s, w) => s + w.price, 0)
+      });
+    }
+
+    setCombos(newCombos);
+    setCurrentStep(3);
+  };
+
+  const handleReplaceWine = (comboId: string, wineIndex: number) => {
+    setReplaceState({ comboId, wineIndex, show: true });
+  };
+
+  const handleConfirmReplace = (newWine: Wine) => {
+    setCombos(prev => prev.map(combo => {
+      if (combo.id !== replaceState.comboId) return combo;
+      const newWines = [...combo.wines];
+      newWines[replaceState.wineIndex] = newWine;
+      return {
+        ...combo,
+        wines: newWines,
+        total: newWines.reduce((s, w) => s + w.price, 0)
+      };
+    }));
+    setReplaceState({ comboId: '', wineIndex: -1, show: false });
+    Taro.showToast({ title: '已替换', icon: 'success' });
+  };
+
+  const getComboPeopleAnalysis = (combo: GiftCombo) => {
+    const peopleCount: Record<string, number> = {};
+    combo.wines.forEach(wine => {
+      wine.suitableFor.forEach(p => {
+        peopleCount[p] = (peopleCount[p] || 0) + 1;
+      });
+    });
+    const sorted = Object.entries(peopleCount).sort((a, b) => b[1] - a[1]);
+    return sorted.slice(0, 3).map(([name, count]) => ({
+      name,
+      count,
+      percent: Math.round((count / combo.wines.length) * 100)
+    }));
+  };
+
+  const getComboOccasionAnalysis = (combo: GiftCombo) => {
+    const occasionCount: Record<string, number> = {};
+    combo.wines.forEach(wine => {
+      wine.occasions.forEach(o => {
+        occasionCount[o] = (occasionCount[o] || 0) + 1;
+      });
+    });
+    const sorted = Object.entries(occasionCount).sort((a, b) => b[1] - a[1]);
+    return sorted.slice(0, 3).map(([name, count]) => ({
+      name,
+      count,
+      percent: Math.round((count / combo.wines.length) * 100)
+    }));
+  };
 
   const canGoNext = () => {
     if (currentStep === 0) return !!selectedBudget;
@@ -149,7 +212,9 @@ const GiftPage: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (currentStep < 3) {
+    if (currentStep === 2) {
+      handleGenerateRecommendations();
+    } else if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -165,40 +230,41 @@ const GiftPage: React.FC = () => {
     setSelectedBudget('');
     setSelectedRecipient('');
     setSelectedOccasion('');
+    setCombos([]);
   };
 
   const handleToggleFavorite = (wineId: string) => {
+    const wasFav = isFavorite(wineId);
     toggleFavorite(wineId);
     Taro.showToast({
-      title: isFavorite(wineId) ? '已取消收藏' : '已加入收藏',
+      title: wasFav ? '已取消收藏' : '已加入收藏',
       icon: 'success'
     });
   };
 
   const handleToggleCompare = (wineId: string) => {
-    const wasInCompare = isInCompare(wineId);
-    if (!wasInCompare && compareList.length >= 3) {
-      Taro.showToast({ title: '对比清单最多3款', icon: 'none' });
-      return;
-    }
-    toggleCompare(wineId);
+    const result = toggleCompare(wineId);
     Taro.showToast({
-      title: wasInCompare ? '已移出对比' : '已加入对比',
-      icon: 'success'
+      title: result.message,
+      icon: result.success ? 'success' : 'none'
     });
   };
 
   const handleAddComboToFavorites = (combo: GiftCombo) => {
+    let count = 0;
     combo.wines.forEach(w => {
-      if (!isFavorite(w.id)) toggleFavorite(w.id);
+      if (!isFavorite(w.id)) {
+        toggleFavorite(w.id);
+        count++;
+      }
     });
-    Taro.showToast({ title: `已收藏${combo.wines.length}款`, icon: 'success' });
+    Taro.showToast({ title: count > 0 ? `已收藏${count}款` : '已全部收藏', icon: 'success' });
   };
 
   const handleAddComboToCompare = (combo: GiftCombo) => {
     const canAdd = 3 - compareList.length;
     if (canAdd <= 0) {
-      Taro.showToast({ title: '对比清单已满', icon: 'none' });
+      Taro.showToast({ title: '对比清单已满（最多3款）', icon: 'none' });
       return;
     }
     const toAdd = combo.wines.filter(w => !isInCompare(w.id)).slice(0, canAdd);
@@ -208,6 +274,12 @@ const GiftPage: React.FC = () => {
     }
     toAdd.forEach(w => toggleCompare(w.id));
     Taro.showToast({ title: `已加入对比${toAdd.length}款`, icon: 'success' });
+  };
+
+  const getReplaceWine = () => {
+    const combo = combos.find(c => c.id === replaceState.comboId);
+    if (!combo) return null;
+    return combo.wines[replaceState.wineIndex];
   };
 
   const renderProgress = () => (
@@ -313,84 +385,178 @@ const GiftPage: React.FC = () => {
     </View>
   );
 
-  const renderResult = () => (
-    <View>
-      <View className={styles.resultHeader}>
-        <Text className={styles.resultIcon}>🎁</Text>
-        <Text className={styles.resultTitle}>为您精选推荐</Text>
-        <Text className={styles.resultSummary}>
-          预算：<Text className={styles.highlight}>{getOptionName('budget', selectedBudget)}</Text>
-          {' · '}
-          对象：<Text className={styles.highlight}>{getOptionName('recipient', selectedRecipient)}</Text>
-          {' · '}
-          场合：<Text className={styles.highlight}>{getOptionName('occasion', selectedOccasion)}</Text>
-        </Text>
-      </View>
+  const renderResult = () => {
+    const replaceWine = getReplaceWine();
+    const candidates = replaceWine ? getReplaceCandidates(replaceWine.id) : [];
 
-      {recommendedCombos.length > 0 ? (
-        recommendedCombos.map((combo, comboIndex) => (
-          <View key={combo.id} className={styles.comboCard}>
-            <View className={styles.comboHeader}>
-              <Text className={classnames(styles.comboBadge, styles[`badge${comboIndex + 1}`])}>
-                {combo.badge}
-              </Text>
-              <Text className={styles.comboName}>{combo.name}</Text>
-            </View>
+    return (
+      <View>
+        <View className={styles.resultHeader}>
+          <Text className={styles.resultIcon}>🎁</Text>
+          <Text className={styles.resultTitle}>为您精选推荐</Text>
+          <Text className={styles.resultSummary}>
+            预算：<Text className={styles.highlight}>{getOptionName('budget', selectedBudget)}</Text>
+            {' · '}
+            对象：<Text className={styles.highlight}>{getOptionName('recipient', selectedRecipient)}</Text>
+            {' · '}
+            场合：<Text className={styles.highlight}>{getOptionName('occasion', selectedOccasion)}</Text>
+          </Text>
+        </View>
 
-            <View className={styles.comboWines}>
-              {combo.wines.map(wine => (
-                <View key={wine.id} className={styles.comboWineItem}>
-                  <Image
-                    className={styles.wineImage}
-                    src={`https://picsum.photos/id/${wine.imageId}/100/100`}
-                    mode='aspectFill'
-                  />
-                  <View className={styles.wineInfo}>
-                    <Text className={styles.wineName}>{wine.name}</Text>
-                    <Text className={styles.wineDesc}>{wine.origin} · {wine.subCategory}</Text>
-                    <Text className={styles.wineFor}>
-                      适合: {wine.suitableFor.slice(0, 2).join('、')}
-                    </Text>
-                  </View>
-                  <Text className={styles.winePrice}>¥{wine.price}</Text>
+        {combos.length > 0 ? (
+          combos.map((combo, comboIndex) => {
+            const peopleAnalysis = getComboPeopleAnalysis(combo);
+            const occasionAnalysis = getComboOccasionAnalysis(combo);
+            return (
+              <View key={combo.id} className={styles.comboCard}>
+                <View className={styles.comboHeader}>
+                  <Text className={classnames(styles.comboBadge, styles[`badge${comboIndex + 1}`])}>
+                    {combo.badge}
+                  </Text>
+                  <Text className={styles.comboName}>{combo.name}</Text>
                 </View>
-              ))}
-            </View>
 
-            <View className={styles.comboFooter}>
-              <View className={styles.comboTotal}>
-                <Text className={styles.totalLabel}>共{combo.wines.length}款 · 合计</Text>
-                <Text className={styles.totalPrice}>¥{combo.total}</Text>
+                <View className={styles.comboAnalysis}>
+                  <View className={styles.analysisItem}>
+                    <Text className={styles.analysisLabel}>👥 人群偏向</Text>
+                    <View className={styles.analysisTags}>
+                      {peopleAnalysis.map(p => (
+                        <Text key={p.name} className={styles.analysisTag}>
+                          {p.name} {p.percent}%
+                        </Text>
+                      ))}
+                    </View>
+                  </View>
+                  <View className={styles.analysisItem}>
+                    <Text className={styles.analysisLabel}>🎉 场合适配</Text>
+                    <View className={styles.analysisTags}>
+                      {occasionAnalysis.map(o => (
+                        <Text key={o.name} className={styles.analysisTag}>
+                          {o.name} {o.percent}%
+                        </Text>
+                      ))}
+                    </View>
+                  </View>
+                </View>
+
+                <View className={styles.comboWines}>
+                  {combo.wines.map((wine, wineIndex) => (
+                    <View key={`${combo.id}-${wine.id}`} className={styles.comboWineItem}>
+                      <View className={styles.comboWineIndex}>{wineIndex + 1}</View>
+                      <Image
+                        className={styles.wineImage}
+                        src={`https://picsum.photos/id/${wine.imageId}/100/100`}
+                        mode='aspectFill'
+                      />
+                      <View className={styles.wineInfo}>
+                        <Text className={styles.wineName}>{wine.name}</Text>
+                        <Text className={styles.wineDesc}>{wine.origin} · {wine.subCategory}</Text>
+                        <Text className={styles.wineFor}>
+                          适合: {wine.suitableFor.slice(0, 2).join('、')}
+                        </Text>
+                      </View>
+                      <View className={styles.winePriceWrap}>
+                        <Text className={styles.winePrice}>¥{wine.price}</Text>
+                        <Button
+                          className={styles.replaceBtn}
+                          onClick={() => handleReplaceWine(combo.id, wineIndex)}
+                        >
+                          🔄 换一款
+                        </Button>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+
+                <View className={styles.comboFooter}>
+                  <View className={styles.comboTotal}>
+                    <Text className={styles.totalLabel}>共{combo.wines.length}款 · 合计</Text>
+                    <Text className={styles.totalPrice}>¥{combo.total}</Text>
+                  </View>
+                  <View className={styles.comboActions}>
+                    <Button
+                      className={classnames(styles.actionBtn, styles.favBtn)}
+                      onClick={() => handleAddComboToFavorites(combo)}
+                    >
+                      ❤️ 收藏
+                    </Button>
+                    <Button
+                      className={classnames(styles.actionBtn, styles.compareBtn)}
+                      onClick={() => handleAddComboToCompare(combo)}
+                    >
+                      📊 对比
+                    </Button>
+                  </View>
+                </View>
               </View>
-              <View className={styles.comboActions}>
-                <Button
-                  className={classnames(styles.actionBtn, styles.favBtn)}
-                  onClick={() => handleAddComboToFavorites(combo)}
-                >
-                  ❤️ 收藏
-                </Button>
-                <Button
-                  className={classnames(styles.actionBtn, styles.compareBtn)}
-                  onClick={() => handleAddComboToCompare(combo)}
-                >
-                  📊 对比
-                </Button>
-              </View>
+            );
+          })
+        ) : (
+          <View className={styles.emptyState}>
+            <Text className={styles.emptyIcon}>🤔</Text>
+            <Text className={styles.emptyText}>暂无完全匹配的酒款，试试调整筛选条件？</Text>
+          </View>
+        )}
+
+        <Button className={styles.retryBtn} onClick={handleReset}>
+          🔄 重新选择
+        </Button>
+
+        {replaceState.show && replaceWine && (
+          <View className={styles.replaceModal} onClick={() => setReplaceState({ comboId: '', wineIndex: -1, show: false })}>
+            <View className={styles.replaceContent} onClick={(e) => e.stopPropagation()}>
+              <Text className={styles.replaceTitle}>替换「{replaceWine.name}」</Text>
+              <Text className={styles.replaceSubtitle}>选择同价位的其他酒款</Text>
+              
+              <ScrollView className={styles.replaceList} scrollY>
+                {candidates.length > 0 ? (
+                  candidates.map(wine => (
+                    <View key={wine.id} className={styles.replaceItem}>
+                      <Image
+                        className={styles.replaceItemImage}
+                        src={`https://picsum.photos/id/${wine.imageId}/100/100`}
+                        mode='aspectFill'
+                      />
+                      <View className={styles.replaceItemInfo}>
+                        <Text className={styles.replaceItemName}>{wine.name}</Text>
+                        <Text className={styles.replaceItemDesc}>{wine.origin} · {wine.subCategory}</Text>
+                        <View className={styles.replaceItemTags}>
+                          <Text className={styles.replaceItemTag}>⭐ {wine.rating}</Text>
+                          <Text className={styles.replaceItemTag}>
+                            {wine.suitableFor.slice(0, 1).join('')}
+                          </Text>
+                        </View>
+                      </View>
+                      <View className={styles.replaceItemRight}>
+                        <Text className={styles.replaceItemPrice}>¥{wine.price}</Text>
+                        <Button
+                          className={styles.replaceItemBtn}
+                          onClick={() => handleConfirmReplace(wine)}
+                        >
+                          替换
+                        </Button>
+                      </View>
+                    </View>
+                  ))
+                ) : (
+                  <View className={styles.replaceEmpty}>
+                    <Text>暂无可替换的酒款</Text>
+                  </View>
+                )}
+              </ScrollView>
+
+              <Button
+                className={classnames(styles.replaceCancelBtn)}
+                onClick={() => setReplaceState({ comboId: '', wineIndex: -1, show: false })}
+              >
+                取消
+              </Button>
             </View>
           </View>
-        ))
-      ) : (
-        <View className={styles.emptyState}>
-          <Text className={styles.emptyIcon}>🤔</Text>
-          <Text className={styles.emptyText}>暂无完全匹配的酒款，试试调整筛选条件？</Text>
-        </View>
-      )}
-
-      <Button className={styles.retryBtn} onClick={handleReset}>
-        🔄 重新选择
-      </Button>
-    </View>
-  );
+        )}
+      </View>
+    );
+  };
 
   const renderCurrentStep = () => {
     switch (currentStep) {

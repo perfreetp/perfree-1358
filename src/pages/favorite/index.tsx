@@ -60,7 +60,7 @@ const FavoritePage: React.FC = () => {
     setCompareTotalPrice(total);
   };
 
-  const generateShareText = (wines: Wine[]) => {
+  const generateShareText = (wines: Wine[], type: 'single' | 'set' = 'single') => {
     if (wines.length === 0) {
       return {
         title: '酒识百科 - 我的酒单',
@@ -68,8 +68,15 @@ const FavoritePage: React.FC = () => {
       };
     }
     const total = wines.reduce((sum, w) => sum + w.price, 0);
-    const lines = wines.map(w => `· ${w.name} ¥${w.price}`).join('\n');
-    const content = `🍷 我的酒单推荐\n\n${lines}\n\n共${wines.length}款，合计 ¥${total}\n—— 来自「酒识百科」`;
+    const label = type === 'set' ? '【成套推荐】' : '【单瓶精选】';
+    
+    const lines = wines.map((w, i) => {
+      const forPeople = w.suitableFor.slice(0, 2).join('、');
+      const occasions = w.occasions.slice(0, 2).join('、');
+      return `${i + 1}. ${w.name}\n   💰 ¥${w.price} / 瓶\n   👥 适合: ${forPeople}\n   🎉 场合: ${occasions}`;
+    }).join('\n\n');
+    
+    const content = `🍷 ${label} 我的酒单推荐\n\n${lines}\n\n━━━━━━━━━━━━━\n共${wines.length}款，合计 ¥${total}\n\n—— 来自「酒识百科」`;
     return {
       title: `精选${wines.length}款好酒推荐，合计¥${total}`,
       content
@@ -308,6 +315,9 @@ const FavoritePage: React.FC = () => {
           <ScrollView className={styles.cardScroll} onClick={(e) => e.stopPropagation()}>
             <View className={styles.giftCard}>
               <View className={styles.giftCardHeader}>
+                <View className={styles.giftCardBadge}>
+                  {activeTab === 'favorites' ? '🌟 单瓶精选' : '📊 对比清单'}
+                </View>
                 <Text className={styles.giftCardTitle}>🍷 我的精选酒单</Text>
                 <Text className={styles.giftCardSubtitle}>来自「酒识百科」</Text>
               </View>
@@ -326,9 +336,14 @@ const FavoritePage: React.FC = () => {
                       <Text className={styles.giftCardDesc}>
                         {wine.origin} · {wine.subCategory}
                       </Text>
-                      <Text className={styles.giftCardFor}>
-                        适合: {wine.suitableFor.slice(0, 2).join('、')}
-                      </Text>
+                      <View className={styles.giftCardTags}>
+                        <Text className={styles.giftCardTag}>
+                          👥 {wine.suitableFor.slice(0, 2).join('、')}
+                        </Text>
+                        <Text className={styles.giftCardTag}>
+                          🎉 {wine.occasions.slice(0, 2).join('、')}
+                        </Text>
+                      </View>
                     </View>
                     <Text className={styles.giftCardPrice}>¥{wine.price}</Text>
                   </View>

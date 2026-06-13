@@ -409,6 +409,17 @@
   margin-bottom: $spacing-md;
 }
 
+.giftCardBadge {
+  display: inline-block;
+  padding: 6rpx 20rpx;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-dark 100%);
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border-radius: $radius-round;
+  margin-bottom: $spacing-sm;
+}
+
 .giftCardTitle {
   font-size: $font-size-xl;
   font-weight: $font-weight-bold;
@@ -480,11 +491,20 @@
   @include text-ellipsis;
 }
 
-.giftCardFor {
-  font-size: $font-size-xs;
+.giftCardTags {
+  margin-top: 6rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.giftCardTag {
+  font-size: 20rpx;
   color: $color-secondary-dark;
-  margin-top: 4rpx;
-  display: block;
+  background-color: rgba(212, 175, 55, 0.12);
+  padding: 2rpx 10rpx;
+  border-radius: $radius-sm;
+  white-space: nowrap;
 }
 
 .giftCardPrice {

@@ -284,8 +284,8 @@ $text-secondary: #6B6B6B;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 24px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 2px dashed #E8E0D4;
 
     .comboBadge {
@@ -318,103 +318,182 @@ $text-secondary: #6B6B6B;
       color: $text-primary;
     }
   }
+}
 
-  .comboWines {
-    margin-bottom: 24px;
-  }
+.comboAnalysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: #FFFBF0;
+  border-radius: 16px;
 
-  .comboWineItem {
+  .analysisItem {
     display: flex;
     align-items: center;
-    padding: 20px 0;
-    border-bottom: 2px solid #F5F0E8;
+    gap: 16px;
+  }
 
-    &:last-child {
-      border-bottom: none;
+  .analysisLabel {
+    font-size: 26px;
+    color: $text-secondary;
+    font-weight: 500;
+    flex-shrink: 0;
+    width: 140px;
+  }
+
+  .analysisTags {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .analysisTag {
+    font-size: 24px;
+    color: $primary-color;
+    background: rgba(139, 0, 0, 0.08);
+    padding: 4px 16px;
+    border-radius: 16px;
+    font-weight: 500;
+  }
+}
+
+.comboWines {
+  margin-bottom: 24px;
+}
+
+.comboWineItem {
+  display: flex;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 2px solid #F5F0E8;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.comboWineIndex {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $secondary-color, #B8960C);
+  color: white;
+  font-size: 26px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 16px;
+}
+
+.wineImage {
+  width: 120px;
+  height: 120px;
+  border-radius: 16px;
+  margin-right: 24px;
+  background: #F5F0E8;
+  flex-shrink: 0;
+}
+
+.wineInfo {
+  flex: 1;
+  min-width: 0;
+
+  .wineName {
+    font-size: 30px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 6px;
+  }
+
+  .wineDesc {
+    font-size: 24px;
+    color: $text-secondary;
+    margin-bottom: 8px;
+  }
+
+  .wineFor {
+    font-size: 22px;
+    color: $secondary-color;
+    font-weight: 500;
+  }
+}
+
+.winePriceWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.winePrice {
+  font-size: 32px;
+  font-weight: bold;
+  color: $primary-color;
+}
+
+.replaceBtn {
+  font-size: 24px;
+  color: $primary-color;
+  background: #FFF5F5;
+  border: 2px solid $primary-color;
+  border-radius: 24px;
+  padding: 6px 16px;
+  font-weight: 500;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.comboFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 24px;
+  border-top: 2px dashed #E8E0D4;
+
+  .comboTotal {
+    .totalLabel {
+      font-size: 24px;
+      color: $text-secondary;
     }
 
-    .wineImage {
-      width: 120px;
-      height: 120px;
-      border-radius: 16px;
-      margin-right: 24px;
-      background: #F5F0E8;
-    }
-
-    .wineInfo {
-      flex: 1;
-
-      .wineName {
-        font-size: 30px;
-        font-weight: 600;
-        color: $text-primary;
-        margin-bottom: 6px;
-      }
-
-      .wineDesc {
-        font-size: 24px;
-        color: $text-secondary;
-        margin-bottom: 8px;
-      }
-
-      .wineFor {
-        font-size: 22px;
-        color: $secondary-color;
-        font-weight: 500;
-      }
-    }
-
-    .winePrice {
-      font-size: 32px;
+    .totalPrice {
+      font-size: 44px;
       font-weight: bold;
       color: $primary-color;
+      margin-left: 8px;
     }
   }
 
-  .comboFooter {
+  .comboActions {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 24px;
-    border-top: 2px dashed #E8E0D4;
+    gap: 16px;
+  }
 
-    .comboTotal {
-      .totalLabel {
-        font-size: 24px;
-        color: $text-secondary;
-      }
+  .actionBtn {
+    padding: 16px 28px;
+    border-radius: 32px;
+    font-size: 26px;
+    font-weight: 600;
+    border: none;
+  }
 
-      .totalPrice {
-        font-size: 44px;
-        font-weight: bold;
-        color: $primary-color;
-        margin-left: 8px;
-      }
-    }
+  .favBtn {
+    background: #FFF5F5;
+    color: $primary-color;
+    border: 2px solid $primary-color;
+  }
 
-    .comboActions {
-      display: flex;
-      gap: 16px;
-    }
-
-    .actionBtn {
-      padding: 16px 28px;
-      border-radius: 32px;
-      font-size: 26px;
-      font-weight: 600;
-      border: none;
-    }
-
-    .favBtn {
-      background: #FFF5F5;
-      color: $primary-color;
-      border: 2px solid $primary-color;
-    }
-
-    .compareBtn {
-      background: linear-gradient(135deg, $primary-color, #A52A2A);
-      color: white;
-    }
+  .compareBtn {
+    background: linear-gradient(135deg, $primary-color, #A52A2A);
+    color: white;
   }
 }
 
@@ -444,4 +523,146 @@ $text-secondary: #6B6B6B;
     color: $text-secondary;
     margin-bottom: 32px;
   }
+}
+
+.replaceModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.replaceContent {
+  background-color: $card-bg;
+  border-radius: 32px 32px 0 0;
+  padding: 32px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.replaceTitle {
+  font-size: 36px;
+  font-weight: bold;
+  color: $text-primary;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.replaceSubtitle {
+  font-size: 28px;
+  color: $text-secondary;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.replaceList {
+  flex: 1;
+  max-height: 500px;
+  margin-bottom: 24px;
+}
+
+.replaceItem {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background: #FAF7F2;
+  border-radius: 20px;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.replaceItemImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 16px;
+  margin-right: 20px;
+  background: #F5F0E8;
+  flex-shrink: 0;
+}
+
+.replaceItemInfo {
+  flex: 1;
+  min-width: 0;
+
+  .replaceItemName {
+    font-size: 30px;
+    font-weight: 600;
+    color: $text-primary;
+    margin-bottom: 6px;
+  }
+
+  .replaceItemDesc {
+    font-size: 24px;
+    color: $text-secondary;
+    margin-bottom: 10px;
+  }
+
+  .replaceItemTags {
+    display: flex;
+    gap: 8px;
+  }
+
+  .replaceItemTag {
+    font-size: 22px;
+    color: $secondary-color;
+    background: rgba(212, 175, 55, 0.15);
+    padding: 4px 12px;
+    border-radius: 12px;
+  }
+}
+
+.replaceItemRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+
+  .replaceItemPrice {
+    font-size: 32px;
+    font-weight: bold;
+    color: $primary-color;
+  }
+
+  .replaceItemBtn {
+    font-size: 26px;
+    color: white;
+    background: linear-gradient(135deg, $primary-color, #A52A2A);
+    border-radius: 24px;
+    padding: 10px 24px;
+    font-weight: 500;
+
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}
+
+.replaceEmpty {
+  text-align: center;
+  padding: 60px 32px;
+  color: $text-secondary;
+  font-size: 28px;
+}
+
+.replaceCancelBtn {
+  width: 100%;
+  height: 88px;
+  border-radius: 44px;
+  font-size: 30px;
+  font-weight: 500;
+  background: #F0EBE3;
+  color: $text-primary;
+  border: none;
 }

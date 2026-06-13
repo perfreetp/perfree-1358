@@ -69,10 +69,10 @@ const DetailPage: React.FC = () => {
 
   const handleCompareClick = () => {
     console.log('[DetailPage] Toggle compare:', wine.id);
-    toggleCompare(wine.id);
+    const result = toggleCompare(wine.id);
     Taro.showToast({
-      title: isInCompare(wine.id) ? '已移除对比' : '已加入对比',
-      icon: 'success'
+      title: result.message,
+      icon: result.success ? 'success' : 'none'
     });
   };
 
