@@ -66,7 +66,7 @@
 
 .hotScroll {
   @include scroll-x-container;
-  margin: 0 -$page-padding;
+  margin: 0 (-$page-padding);
   padding: 0 $page-padding;
 }
 
@@ -205,4 +205,42 @@
   color: $color-text-tertiary;
   margin-top: 2rpx;
   @include text-ellipsis;
+}
+
+.giftBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, $color-secondary-light 0%, $color-secondary 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  margin-bottom: $spacing-lg;
+  box-shadow: $shadow-card;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.giftBannerContent {
+  flex: 1;
+}
+
+.giftBannerTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.giftBannerDesc {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+}
+
+.giftBannerArrow {
+  font-size: $font-size-xl;
+  color: $color-primary;
+  font-weight: $font-weight-bold;
 }

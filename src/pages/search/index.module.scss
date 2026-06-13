@@ -82,6 +82,61 @@
   padding: 0 $page-padding;
 }
 
+.activeFilters {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-top: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.activeFiltersHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.activeFiltersTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.clearAllBtn {
+  @include button-reset;
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background: transparent;
+}
+
+.activeFiltersTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.activeFilterTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.1) 0%, rgba(139, 0, 0, 0.05) 100%);
+  border: 1rpx solid rgba(139, 0, 0, 0.2);
+  border-radius: $radius-sm;
+  padding: 6rpx 12rpx;
+}
+
+.activeFilterText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+}
+
+.activeFilterClose {
+  font-size: 20rpx;
+  color: $color-primary;
+  line-height: 1;
+}
+
 .filterToggle {
   display: flex;
   align-items: center;
@@ -106,13 +161,57 @@
   background: transparent;
 }
 
+.advancedFilters {
+  margin-top: $spacing-md;
+}
+
+.resetBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  margin-top: $spacing-md;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
 .flavorSection {
   margin-top: $spacing-md;
 }
 
+.flavorTabs {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-sm;
+}
+
+.flavorTab {
+  @include button-reset;
+  padding: $spacing-xs $spacing-md;
+  border-radius: $radius-button;
+  background-color: $color-bg-card;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.activeFlavorTab {
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-weight: $font-weight-medium;
+}
+
 .flavorScroll {
   @include scroll-x-container;
-  margin: 0 -$page-padding;
+  margin: 0 (-$page-padding);
   padding: 0 $page-padding;
 }
 
@@ -142,6 +241,12 @@
 .emptyText {
   font-size: $font-size-md;
   color: $color-text-tertiary;
+}
+
+.emptySubText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: $spacing-xs;
 }
 
 .compareFloat {

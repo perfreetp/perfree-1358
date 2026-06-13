@@ -67,10 +67,84 @@
   color: $color-text-white;
 }
 
+.compareActions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.compareActionBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-sm;
+  border-radius: $radius-button;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  color: $color-text-white;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.compareActionSecondary {
+  @include button-reset;
+  height: $button-height-sm;
+  padding: 0 $spacing-lg;
+  border-radius: $radius-button;
+  background-color: $color-bg-card;
+  color: $color-text-secondary;
+  font-size: $font-size-sm;
+  border: 2rpx solid $color-border;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.batchAddBtn {
+  @include button-reset;
+  width: 100%;
+  height: $button-height-sm;
+  border-radius: $radius-button;
+  background-color: rgba(212, 175, 55, 0.15);
+  color: $color-secondary-dark;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  margin-bottom: $spacing-md;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
 .wineList {
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+}
+
+.totalBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-top: $spacing-sm;
+}
+
+.totalLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.totalPrice {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-price;
 }
 
 .emptyState {
@@ -167,7 +241,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -177,18 +251,69 @@
 
 .exportContent {
   background-color: $color-bg-card;
-  border-radius: $radius-lg;
+  border-radius: $radius-xl;
   padding: $spacing-lg;
   width: 100%;
-  max-width: 600rpx;
+  max-width: 650rpx;
 }
 
 .exportTitle {
   font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
+  font-weight: $font-weight-bold;
   color: $color-text-primary;
   text-align: center;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.exportOptions {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+}
+
+.exportOption {
+  @include button-reset;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: $color-bg-page;
+  border-radius: $radius-lg;
+  text-align: left;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.exportOptionIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  background: linear-gradient(135deg, $color-primary-light 0%, $color-primary 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.exportOptionInfo {
+  flex: 1;
+}
+
+.exportOptionTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  margin-bottom: 4rpx;
+}
+
+.exportOptionDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
 }
 
 .exportItem {
@@ -247,6 +372,7 @@
   height: $button-height-md;
   border-radius: $radius-button;
   font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
 
   &:active {
     transform: scale(0.98);
@@ -261,4 +387,145 @@
 .confirmBtn {
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   color: $color-text-white;
+}
+
+.cardScroll {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.giftCard {
+  background: linear-gradient(180deg, #FFF8F0 0%, #FFFFFF 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+}
+
+.giftCardHeader {
+  text-align: center;
+  padding-bottom: $spacing-md;
+  border-bottom: 2rpx dashed $color-border;
+  margin-bottom: $spacing-md;
+}
+
+.giftCardTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  display: block;
+  margin-bottom: $spacing-xs;
+}
+
+.giftCardSubtitle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.giftCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.giftCardItem {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-sm;
+}
+
+.giftCardIndex {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-dark 100%);
+  color: $color-text-white;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.giftCardImage {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: $radius-md;
+  background-color: $color-bg-hover;
+  flex-shrink: 0;
+}
+
+.giftCardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.giftCardName {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  display: block;
+  @include text-ellipsis;
+}
+
+.giftCardDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 2rpx;
+  display: block;
+  @include text-ellipsis;
+}
+
+.giftCardFor {
+  font-size: $font-size-xs;
+  color: $color-secondary-dark;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.giftCardPrice {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  color: $color-price;
+  flex-shrink: 0;
+}
+
+.giftCardFooter {
+  margin-top: $spacing-lg;
+  padding-top: $spacing-md;
+  border-top: 2rpx dashed $color-border;
+}
+
+.giftCardTotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.giftCardTotalLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.giftCardTotalPrice {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+}
+
+.giftCardSlogan {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+.cardActions {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
 }

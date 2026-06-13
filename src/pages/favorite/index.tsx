@@ -1,37 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Button } from '@tarojs/components';
+import { View, Text, Image, Button, ScrollView } from '@tarojs/components';
 import Taro, { useShareAppMessage, usePullDownRefresh } from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { useWineStore } from '@/store/WineContext';
-import { getWineById } from '@/data/wines';
+import { getWineById, getWinesByIds } from '@/data/wines';
 import WineCard from '@/components/WineCard';
 import SectionHeader from '@/components/SectionHeader';
 import { Wine } from '@/types/wine';
 
 const FavoritePage: React.FC = () => {
-  const { favorites, ratingNotes, compareList, clearCompare } = useWineStore();
-  const [activeTab, setActiveTab] = useState('favorites');
+  const { favorites, ratingNotes, compareList, clearCompare, toggleFavorite, toggleCompare, isFavorite, isInCompare } = useWineStore();
+  const [activeTab, setActiveTab] = useState<'favorites' | 'compare'>('favorites');
   const [favoriteWines, setFavoriteWines] = useState<Wine[]>([]);
+  const [compareWines, setCompareWines] = useState<Wine[]>([]);
   const [showExportModal, setShowExportModal] = useState(false);
+  const [exportSource, setExportSource] = useState<'favorites' | 'compare'>('favorites');
+  const [showCardPreview, setShowCardPreview] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [compareTotalPrice, setCompareTotalPrice] = useState(0);
 
   useEffect(() => {
     console.log('[FavoritePage] Mounted');
     loadFavorites();
-  }, [favorites]);
+    loadCompareWines();
+  }, [favorites, compareList]);
 
   usePullDownRefresh(() => {
     console.log('[FavoritePage] Pull down refresh');
     loadFavorites();
+    loadCompareWines();
     setTimeout(() => {
       Taro.stopPullDownRefresh();
     }, 1000);
   });
 
   useShareAppMessage(() => {
+    const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
+    const shareText = generateShareText(wines);
     return {
-      title: '酒识百科 - 专业酒类知识库',
+      title: shareText.title,
       path: '/pages/favorite/index'
     };
   });
@@ -42,6 +50,30 @@ const FavoritePage: React.FC = () => {
     setFavoriteWines(wines);
     const total = wines.reduce((sum, wine) => sum + wine.price, 0);
     setTotalPrice(total);
+  };
+
+  const loadCompareWines = () => {
+    console.log('[FavoritePage] Loading compare wines:', compareList);
+    const wines = compareList.map(id => getWineById(id)).filter(Boolean) as Wine[];
+    setCompareWines(wines);
+    const total = wines.reduce((sum, wine) => sum + wine.price, 0);
+    setCompareTotalPrice(total);
+  };
+
+  const generateShareText = (wines: Wine[]) => {
+    if (wines.length === 0) {
+      return {
+        title: '酒识百科 - 我的酒单',
+        content: '来酒识百科发现更多美酒'
+      };
+    }
+    const total = wines.reduce((sum, w) => sum + w.price, 0);
+    const lines = wines.map(w => `· ${w.name} ¥${w.price}`).join('\n');
+    const content = `🍷 我的酒单推荐\n\n${lines}\n\n共${wines.length}款，合计 ¥${total}\n—— 来自「酒识百科」`;
+    return {
+      title: `精选${wines.length}款好酒推荐，合计¥${total}`,
+      content
+    };
   };
 
   const handleCompareClick = () => {
@@ -55,37 +87,90 @@ const FavoritePage: React.FC = () => {
     });
   };
 
-  const handleExportClick = () => {
-    if (favoriteWines.length === 0) {
-      Taro.showToast({ title: '暂无收藏酒款可导出', icon: 'none' });
+  const handleExportClick = (source: 'favorites' | 'compare') => {
+    const wines = source === 'favorites' ? favoriteWines : compareWines;
+    if (wines.length === 0) {
+      Taro.showToast({ title: '暂无酒款可导出', icon: 'none' });
       return;
     }
-    console.log('[FavoritePage] Opening export modal');
+    console.log('[FavoritePage] Opening export modal, source:', source);
+    setExportSource(source);
     setShowExportModal(true);
   };
 
-  const handleConfirmExport = () => {
-    console.log('[FavoritePage] Exporting gift list');
-    Taro.showModal({
-      title: '导出成功',
-      content: `礼品清单已生成，共${favoriteWines.length}款酒，总价¥${totalPrice}`,
-      showCancel: false,
-      confirmText: '好的'
+  const handleCopyText = () => {
+    const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
+    const { content } = generateShareText(wines);
+    Taro.setClipboardData({
+      data: content,
+      success: () => {
+        Taro.showToast({ title: '已复制到剪贴板', icon: 'success' });
+      }
     });
+  };
+
+  const handleShareText = () => {
+    const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
+    const { content } = generateShareText(wines);
+    Taro.showModal({
+      title: '分享文案',
+      content,
+      showCancel: false,
+      confirmText: '复制文案',
+      success: () => {
+        Taro.setClipboardData({
+          data: content,
+          success: () => {
+            Taro.showToast({ title: '已复制文案', icon: 'success' });
+          }
+        });
+      }
+    });
+  };
+
+  const handleShowCard = () => {
     setShowExportModal(false);
+    setShowCardPreview(true);
+  };
+
+  const handleSaveCard = () => {
+    Taro.showToast({ title: '长按卡片可保存图片', icon: 'none' });
   };
 
   const handleClearCompare = () => {
     console.log('[FavoritePage] Clearing compare list');
-    clearCompare();
-    Taro.showToast({ title: '已清空对比清单', icon: 'success' });
+    Taro.showModal({
+      title: '确认清空',
+      content: '确定要清空对比清单吗？',
+      success: (res) => {
+        if (res.confirm) {
+          clearCompare();
+          Taro.showToast({ title: '已清空对比清单', icon: 'success' });
+        }
+      }
+    });
+  };
+
+  const handleBatchAddCompare = () => {
+    if (favoriteWines.length === 0) {
+      Taro.showToast({ title: '暂无收藏酒款', icon: 'none' });
+      return;
+    }
+    const canAdd = favoriteWines.filter(w => !isInCompare(w.id)).slice(0, 3 - compareList.length);
+    if (canAdd.length === 0) {
+      Taro.showToast({ title: '对比清单已满或已全部添加', icon: 'none' });
+      return;
+    }
+    canAdd.forEach(w => toggleCompare(w.id));
+    Taro.showToast({ title: `已添加${canAdd.length}款到对比`, icon: 'success' });
   };
 
   const renderStars = (rating: number) => {
     const stars = [];
+    const fullStars = Math.floor(rating);
     for (let i = 1; i <= 5; i++) {
       stars.push(
-        <Text key={i} className={i <= rating ? styles.star : styles.emptyStar}>
+        <Text key={i} className={i <= fullStars ? styles.star : styles.emptyStar}>
           ★
         </Text>
       );
@@ -96,6 +181,9 @@ const FavoritePage: React.FC = () => {
   const sortedNotes = [...ratingNotes].sort((a, b) => 
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
+
+  const currentWines = activeTab === 'favorites' ? favoriteWines : compareWines;
+  const currentTotal = activeTab === 'favorites' ? totalPrice : compareTotalPrice;
 
   return (
     <View className={styles.favoritePage}>
@@ -108,129 +196,169 @@ const FavoritePage: React.FC = () => {
             收藏夹 ({favorites.length})
           </Button>
           <Button
-            className={classnames(styles.tab, activeTab === 'notes' && styles.activeTab)}
-            onClick={() => setActiveTab('notes')}
+            className={classnames(styles.tab, activeTab === 'compare' && styles.activeTab)}
+            onClick={() => setActiveTab('compare')}
           >
-            评分笔记 ({ratingNotes.length})
+            对比清单 ({compareList.length})
           </Button>
         </View>
 
         <View className={styles.actionBar}>
-          <Button className={styles.actionBtn} onClick={handleCompareClick}>
-            <Text>📋</Text>
-            <Text>对比清单 ({compareList.length})</Text>
+          <Button className={styles.actionBtn} onClick={() => handleExportClick(activeTab)}>
+            <Text>📤</Text>
+            <Text>导出清单</Text>
           </Button>
           <Button
             className={classnames(styles.actionBtn, styles.primaryBtn)}
-            onClick={handleExportClick}
+            onClick={() => handleShareText()}
           >
-            <Text>📄</Text>
-            <Text>导出礼品单</Text>
+            <Text>📝</Text>
+            <Text>生成分享文案</Text>
           </Button>
         </View>
 
-        {compareList.length > 0 && (
-          <Button
-            onClick={handleClearCompare}
-            style={{ width: '100%', height: '64rpx', borderRadius: '32rpx', background: '#fff', color: '#86909C', fontSize: '24rpx', marginBottom: '24rpx', border: '1rpx solid #e5e6eb' }}
-          >
-            清空对比清单
+        {activeTab === 'compare' && compareList.length > 0 && (
+          <View className={styles.compareActions}>
+            <Button className={styles.compareActionBtn} onClick={handleCompareClick}>
+              查看详细对比
+            </Button>
+            <Button className={styles.compareActionSecondary} onClick={handleClearCompare}>
+              清空
+            </Button>
+          </View>
+        )}
+
+        {activeTab === 'favorites' && favorites.length > 0 && (
+          <Button className={styles.batchAddBtn} onClick={handleBatchAddCompare}>
+            批量加入对比
           </Button>
         )}
 
-        {activeTab === 'favorites' && (
-          <View>
-            <SectionHeader title='我的收藏' />
-            {favoriteWines.length > 0 ? (
-              <View className={styles.wineList}>
-                {favoriteWines.map(wine => (
-                  <WineCard key={wine.id} wine={wine} showCompare />
-                ))}
+        <View>
+          <SectionHeader title={activeTab === 'favorites' ? '我的收藏' : '对比清单'} />
+          {currentWines.length > 0 ? (
+            <View className={styles.wineList}>
+              {currentWines.map(wine => (
+                <WineCard key={wine.id} wine={wine} showCompare />
+              ))}
+              <View className={styles.totalBar}>
+                <Text className={styles.totalLabel}>共{currentWines.length}款，合计</Text>
+                <Text className={styles.totalPrice}>¥{currentTotal}</Text>
               </View>
-            ) : (
-              <View className={styles.emptyState}>
-                <Text className={styles.emptyIcon}>🤍</Text>
-                <Text className={styles.emptyText}>还没有收藏任何酒款</Text>
-                <Text className={styles.emptyHint}>去发现喜欢的美酒吧</Text>
-              </View>
-            )}
-          </View>
-        )}
-
-        {activeTab === 'notes' && (
-          <View>
-            <SectionHeader title='我的笔记' />
-            {sortedNotes.length > 0 ? (
-              <View>
-                {sortedNotes.map(note => {
-                  const wine = getWineById(note.wineId);
-                  if (!wine) return null;
-                  return (
-                    <View key={note.wineId} className={styles.noteCard}>
-                      <View className={styles.noteHeader}>
-                        <Image
-                          className={styles.noteWineImage}
-                          src={`https://picsum.photos/id/${wine.imageId}/100/100`}
-                          mode='aspectFill'
-                          onError={(e) => console.error('[FavoritePage] Image error:', e)}
-                        />
-                        <View className={styles.noteWineInfo}>
-                          <Text className={styles.noteWineName}>{wine.name}</Text>
-                          <View className={styles.noteRating}>
-                            {renderStars(note.rating)}
-                          </View>
-                        </View>
-                      </View>
-                      {note.note && (
-                        <Text className={styles.noteContent}>{note.note}</Text>
-                      )}
-                      <Text className={styles.noteDate}>
-                        {new Date(note.createdAt).toLocaleDateString('zh-CN')}
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            ) : (
-              <View className={styles.emptyState}>
-                <Text className={styles.emptyIcon}>📝</Text>
-                <Text className={styles.emptyText}>还没有任何评分笔记</Text>
-                <Text className={styles.emptyHint}>在酒款详情页记录您的品鉴感受</Text>
-              </View>
-            )}
-          </View>
-        )}
+            </View>
+          ) : (
+            <View className={styles.emptyState}>
+              <Text className={styles.emptyIcon}>{activeTab === 'favorites' ? '🤍' : '📋'}</Text>
+              <Text className={styles.emptyText}>
+                {activeTab === 'favorites' ? '还没有收藏任何酒款' : '对比清单还是空的'}
+              </Text>
+              <Text className={styles.emptyHint}>
+                {activeTab === 'favorites' ? '去发现喜欢的美酒吧' : '去搜索页添加酒款对比'}
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {showExportModal && (
         <View className={styles.exportModal} onClick={() => setShowExportModal(false)}>
           <View className={styles.exportContent} onClick={(e) => e.stopPropagation()}>
-            <Text className={styles.exportTitle}>礼品清单预览</Text>
-            {favoriteWines.map(wine => (
-              <View key={wine.id} className={styles.exportItem}>
-                <Text className={styles.exportItemName}>{wine.name}</Text>
-                <Text className={styles.exportItemPrice}>¥{wine.price}</Text>
-              </View>
-            ))}
-            <View className={styles.exportTotal}>
-              <Text className={styles.exportTotalLabel}>合计</Text>
-              <Text className={styles.exportTotalPrice}>¥{totalPrice}</Text>
+            <Text className={styles.exportTitle}>
+              {exportSource === 'favorites' ? '收藏清单' : '对比清单'}
+            </Text>
+            
+            <View className={styles.exportOptions}>
+              <Button className={styles.exportOption} onClick={handleCopyText}>
+                <View className={styles.exportOptionIcon}>📋</View>
+                <View className={styles.exportOptionInfo}>
+                  <Text className={styles.exportOptionTitle}>一键复制</Text>
+                  <Text className={styles.exportOptionDesc}>复制清单文字到剪贴板</Text>
+                </View>
+              </Button>
+              
+              <Button className={styles.exportOption} onClick={handleShareText}>
+                <View className={styles.exportOptionIcon}>💬</View>
+                <View className={styles.exportOptionInfo}>
+                  <Text className={styles.exportOptionTitle}>分享文案</Text>
+                  <Text className={styles.exportOptionDesc}>生成适合转发的分享文案</Text>
+                </View>
+              </Button>
+              
+              <Button className={styles.exportOption} onClick={handleShowCard}>
+                <View className={styles.exportOptionIcon}>🖼️</View>
+                <View className={styles.exportOptionInfo}>
+                  <Text className={styles.exportOptionTitle}>清单卡片</Text>
+                  <Text className={styles.exportOptionDesc}>生成精美清单图片卡片</Text>
+                </View>
+              </Button>
             </View>
-            <View className={styles.exportActions}>
+
+            <Button
+              className={classnames(styles.exportBtn, styles.cancelBtn)}
+              onClick={() => setShowExportModal(false)}
+            >
+              取消
+            </Button>
+          </View>
+        </View>
+      )}
+
+      {showCardPreview && currentWines.length > 0 && (
+        <View className={styles.exportModal} onClick={() => setShowCardPreview(false)}>
+          <ScrollView className={styles.cardScroll} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.giftCard}>
+              <View className={styles.giftCardHeader}>
+                <Text className={styles.giftCardTitle}>🍷 我的精选酒单</Text>
+                <Text className={styles.giftCardSubtitle}>来自「酒识百科」</Text>
+              </View>
+              
+              <View className={styles.giftCardBody}>
+                {currentWines.map((wine, index) => (
+                  <View key={wine.id} className={styles.giftCardItem}>
+                    <View className={styles.giftCardIndex}>{index + 1}</View>
+                    <Image
+                      className={styles.giftCardImage}
+                      src={`https://picsum.photos/id/${wine.imageId}/100/100`}
+                      mode='aspectFill'
+                    />
+                    <View className={styles.giftCardInfo}>
+                      <Text className={styles.giftCardName}>{wine.name}</Text>
+                      <Text className={styles.giftCardDesc}>
+                        {wine.origin} · {wine.subCategory}
+                      </Text>
+                      <Text className={styles.giftCardFor}>
+                        适合: {wine.suitableFor.slice(0, 2).join('、')}
+                      </Text>
+                    </View>
+                    <Text className={styles.giftCardPrice}>¥{wine.price}</Text>
+                  </View>
+                ))}
+              </View>
+
+              <View className={styles.giftCardFooter}>
+                <View className={styles.giftCardTotal}>
+                  <Text className={styles.giftCardTotalLabel}>共{currentWines.length}款 · 合计</Text>
+                  <Text className={styles.giftCardTotalPrice}>¥{currentTotal}</Text>
+                </View>
+                <Text className={styles.giftCardSlogan}>探索美酒世界，品味生活艺术</Text>
+              </View>
+            </View>
+
+            <View className={styles.cardActions}>
               <Button
                 className={classnames(styles.exportBtn, styles.cancelBtn)}
-                onClick={() => setShowExportModal(false)}
+                onClick={() => setShowCardPreview(false)}
               >
-                取消
+                关闭
               </Button>
               <Button
                 className={classnames(styles.exportBtn, styles.confirmBtn)}
-                onClick={handleConfirmExport}
+                onClick={handleSaveCard}
               >
-                确认导出
+                保存图片
               </Button>
             </View>
-          </View>
+          </ScrollView>
         </View>
       )}
     </View>

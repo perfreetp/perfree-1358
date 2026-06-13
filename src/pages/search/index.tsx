@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, Input, ScrollView, Button } from '@tarojs/components';
-import Taro, { useShareAppMessage, usePullDownRefresh, useRouter, useReachBottom } from '@tarojs/taro';
+import Taro, { useShareAppMessage, usePullDownRefresh, useRouter, useReachBottom, useDidShow } from '@tarojs/taro';
 import classnames from 'classnames';
 import styles from './index.module.scss';
 import { wines, searchWines, getWinesByCategory } from '@/data/wines';
@@ -14,32 +14,45 @@ import { Wine } from '@/types/wine';
 
 const SearchPage: React.FC = () => {
   const router = useRouter();
-  const { compareList } = useWineStore();
+  const { compareList, searchFilters, setSearchFilters, resetSearchFilters } = useWineStore();
 
-  const [keyword, setKeyword] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [keyword, setKeyword] = useState(searchFilters.keyword);
+  const [selectedCategory, setSelectedCategory] = useState(searchFilters.category);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedBudgets, setSelectedBudgets] = useState<string[]>([]);
-  const [selectedSweetness, setSelectedSweetness] = useState<string[]>([]);
-  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
-  const [selectedFoods, setSelectedFoods] = useState<string[]>([]);
-  const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
-  const [selectedFlavors, setSelectedFlavors] = useState<string[]>([]);
+  const [selectedBudgets, setSelectedBudgets] = useState<string[]>(searchFilters.budgets);
+  const [selectedSweetness, setSelectedSweetness] = useState<string[]>(searchFilters.sweetness);
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>(searchFilters.occasions);
+  const [selectedFoods, setSelectedFoods] = useState<string[]>(searchFilters.foods);
+  const [selectedPeople, setSelectedPeople] = useState<string[]>(searchFilters.people);
+  const [selectedFlavors, setSelectedFlavors] = useState<string[]>(searchFilters.flavors);
+  const [selectedTasteTags, setSelectedTasteTags] = useState<string[]>(searchFilters.tasteTags);
+  const [selectedStyleTags, setSelectedStyleTags] = useState<string[]>(searchFilters.styleTags);
   const [displayWines, setDisplayWines] = useState<Wine[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [activeFlavorTab, setActiveFlavorTab] = useState<'aroma' | 'taste' | 'style'>('aroma');
+
+  useDidShow(() => {
+    console.log('[SearchPage] useDidShow, filters from store:', searchFilters);
+    setKeyword(searchFilters.keyword);
+    setSelectedCategory(searchFilters.category);
+    setSelectedBudgets(searchFilters.budgets);
+    setSelectedSweetness(searchFilters.sweetness);
+    setSelectedOccasions(searchFilters.occasions);
+    setSelectedFoods(searchFilters.foods);
+    setSelectedPeople(searchFilters.people);
+    setSelectedFlavors(searchFilters.flavors);
+    setSelectedTasteTags(searchFilters.tasteTags);
+    setSelectedStyleTags(searchFilters.styleTags);
+  });
 
   useEffect(() => {
     console.log('[SearchPage] Mounted');
-    const categoryParam = router.params.category;
-    if (categoryParam) {
-      setSelectedCategory(categoryParam);
-    }
-    loadWines();
+    filterWines();
   }, []);
 
   usePullDownRefresh(() => {
     console.log('[SearchPage] Pull down refresh');
-    loadWines();
+    filterWines();
     setTimeout(() => {
       Taro.stopPullDownRefresh();
     }, 1000);
@@ -59,13 +72,109 @@ const SearchPage: React.FC = () => {
     };
   });
 
+  const persistFilters = () => {
+    setSearchFilters({
+      keyword,
+      category: selectedCategory,
+      budgets: selectedBudgets,
+      sweetness: selectedSweetness,
+      occasions: selectedOccasions,
+      foods: selectedFoods,
+      people: selectedPeople,
+      flavors: selectedFlavors,
+      tasteTags: selectedTasteTags,
+      styleTags: selectedStyleTags
+    });
+  };
+
   useEffect(() => {
     filterWines();
-  }, [keyword, selectedCategory, selectedBudgets, selectedSweetness, selectedOccasions, selectedFoods, selectedPeople, selectedFlavors]);
+    persistFilters();
+  }, [keyword, selectedCategory, selectedBudgets, selectedSweetness, selectedOccasions, selectedFoods, selectedPeople, selectedFlavors, selectedTasteTags, selectedStyleTags]);
 
-  const loadWines = () => {
-    console.log('[SearchPage] Loading wines');
-    filterWines();
+  const getActiveFilterCount = () => {
+    return selectedBudgets.length + selectedSweetness.length + selectedOccasions.length + 
+           selectedFoods.length + selectedPeople.length + selectedFlavors.length + 
+           selectedTasteTags.length + selectedStyleTags.length + 
+           (keyword ? 1 : 0) + (selectedCategory !== 'all' ? 1 : 0);
+  };
+
+  const getActiveFilterLabels = () => {
+    const labels: { type: string; value: string; label: string }[] = [];
+    
+    if (keyword) {
+      labels.push({ type: 'keyword', value: keyword, label: `关键词: ${keyword}` });
+    }
+    if (selectedCategory !== 'all') {
+      const cat = categories.find(c => c.id === selectedCategory);
+      if (cat) labels.push({ type: 'category', value: selectedCategory, label: cat.name });
+    }
+    selectedBudgets.forEach(id => {
+      const opt = budgetOptions.find(o => o.id === id);
+      if (opt) labels.push({ type: 'budget', value: id, label: opt.name });
+    });
+    selectedSweetness.forEach(id => {
+      const opt = sweetnessOptions.find(o => o.id === id);
+      if (opt) labels.push({ type: 'sweetness', value: id, label: opt.name });
+    });
+    selectedOccasions.forEach(id => {
+      const opt = occasionOptions.find(o => o.id === id);
+      if (opt) labels.push({ type: 'occasion', value: id, label: opt.name });
+    });
+    selectedFoods.forEach(id => {
+      const opt = foodOptions.find(o => o.id === id);
+      if (opt) labels.push({ type: 'food', value: id, label: opt.name });
+    });
+    selectedPeople.forEach(id => {
+      const opt = peopleOptions.find(o => o.id === id);
+      if (opt) labels.push({ type: 'people', value: id, label: opt.name });
+    });
+    selectedFlavors.forEach(f => {
+      labels.push({ type: 'flavor', value: f, label: f });
+    });
+    selectedTasteTags.forEach(f => {
+      labels.push({ type: 'taste', value: f, label: f });
+    });
+    selectedStyleTags.forEach(f => {
+      labels.push({ type: 'style', value: f, label: f });
+    });
+    
+    return labels;
+  };
+
+  const handleRemoveFilter = (type: string, value: string) => {
+    switch (type) {
+      case 'keyword':
+        setKeyword('');
+        break;
+      case 'category':
+        setSelectedCategory('all');
+        break;
+      case 'budget':
+        setSelectedBudgets(prev => prev.filter(id => id !== value));
+        break;
+      case 'sweetness':
+        setSelectedSweetness(prev => prev.filter(id => id !== value));
+        break;
+      case 'occasion':
+        setSelectedOccasions(prev => prev.filter(id => id !== value));
+        break;
+      case 'food':
+        setSelectedFoods(prev => prev.filter(id => id !== value));
+        break;
+      case 'people':
+        setSelectedPeople(prev => prev.filter(id => id !== value));
+        break;
+      case 'flavor':
+        setSelectedFlavors(prev => prev.filter(f => f !== value));
+        break;
+      case 'taste':
+        setSelectedTasteTags(prev => prev.filter(f => f !== value));
+        break;
+      case 'style':
+        setSelectedStyleTags(prev => prev.filter(f => f !== value));
+        break;
+    }
   };
 
   const filterWines = () => {
@@ -76,12 +185,13 @@ const SearchPage: React.FC = () => {
     }
 
     if (selectedCategory !== 'all') {
-      result = getWinesByCategory(selectedCategory);
+      result = result.filter(wine => wine.category === selectedCategory);
     }
 
-    if (selectedFlavors.length > 0) {
+    const allFlavorTags = [...selectedFlavors, ...selectedTasteTags, ...selectedStyleTags];
+    if (allFlavorTags.length > 0) {
       result = result.filter(wine =>
-        selectedFlavors.some(flavor =>
+        allFlavorTags.some(flavor =>
           wine.aroma.includes(flavor) || wine.taste.includes(flavor)
         )
       );
@@ -155,13 +265,27 @@ const SearchPage: React.FC = () => {
     setSelectedCategory(categoryId);
   };
 
-  const handleFlavorClick = (flavorName: string) => {
-    console.log('[SearchPage] Flavor clicked:', flavorName);
-    setSelectedFlavors(prev =>
-      prev.includes(flavorName)
-        ? prev.filter(f => f !== flavorName)
-        : [...prev, flavorName]
-    );
+  const handleFlavorClick = (flavorName: string, type: 'aroma' | 'taste' | 'style') => {
+    console.log('[SearchPage] Flavor clicked:', flavorName, type);
+    if (type === 'aroma') {
+      setSelectedFlavors(prev =>
+        prev.includes(flavorName)
+          ? prev.filter(f => f !== flavorName)
+          : [...prev, flavorName]
+      );
+    } else if (type === 'taste') {
+      setSelectedTasteTags(prev =>
+        prev.includes(flavorName)
+          ? prev.filter(f => f !== flavorName)
+          : [...prev, flavorName]
+      );
+    } else {
+      setSelectedStyleTags(prev =>
+        prev.includes(flavorName)
+          ? prev.filter(f => f !== flavorName)
+          : [...prev, flavorName]
+      );
+    }
   };
 
   const toggleFilter = (type: string, id: string) => {
@@ -193,18 +317,36 @@ const SearchPage: React.FC = () => {
   };
 
   const handleResetFilters = () => {
+    resetSearchFilters();
+    setKeyword('');
+    setSelectedCategory('all');
     setSelectedBudgets([]);
     setSelectedSweetness([]);
     setSelectedOccasions([]);
     setSelectedFoods([]);
     setSelectedPeople([]);
     setSelectedFlavors([]);
-    setKeyword('');
-    setSelectedCategory('all');
+    setSelectedTasteTags([]);
+    setSelectedStyleTags([]);
   };
 
   const allCategories = [{ id: 'all', name: '全部', icon: '🍾', description: '', count: wines.length }, ...categories];
   const aromaFlavors = flavorTags.filter(f => f.type === 'aroma');
+  const tasteFlavors = flavorTags.filter(f => f.type === 'taste');
+  const styleFlavors = flavorTags.filter(f => f.type === 'style');
+  const activeFilterLabels = getActiveFilterLabels();
+
+  const getCurrentFlavorList = () => {
+    if (activeFlavorTab === 'aroma') return aromaFlavors;
+    if (activeFlavorTab === 'taste') return tasteFlavors;
+    return styleFlavors;
+  };
+
+  const isFlavorSelected = (name: string) => {
+    if (activeFlavorTab === 'aroma') return selectedFlavors.includes(name);
+    if (activeFlavorTab === 'taste') return selectedTasteTags.includes(name);
+    return selectedStyleTags.includes(name);
+  };
 
   return (
     <View className={styles.searchPage}>
@@ -238,11 +380,32 @@ const SearchPage: React.FC = () => {
       </View>
 
       <View className={styles.content}>
+        {activeFilterLabels.length > 0 && (
+          <View className={styles.activeFilters}>
+            <View className={styles.activeFiltersHeader}>
+              <Text className={styles.activeFiltersTitle}>已选筛选 ({activeFilterLabels.length})</Text>
+              <Button className={styles.clearAllBtn} onClick={handleResetFilters}>
+                清空全部
+              </Button>
+            </View>
+            <View className={styles.activeFiltersTags}>
+              {activeFilterLabels.map((filter, index) => (
+                <View key={index} className={styles.activeFilterTag}>
+                  <Text className={styles.activeFilterText}>{filter.label}</Text>
+                  <Text className={styles.activeFilterClose} onClick={() => handleRemoveFilter(filter.type, filter.value)}>
+                    ✕
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
         <View className={styles.filterToggle} onClick={() => setShowFilters(!showFilters)}>
           <Text className={styles.filterToggleText}>
             高级筛选
-            {selectedBudgets.length + selectedSweetness.length + selectedOccasions.length + selectedFoods.length + selectedPeople.length > 0 &&
-              ` (已选${selectedBudgets.length + selectedSweetness.length + selectedOccasions.length + selectedFoods.length + selectedPeople.length}项)`
+            {getActiveFilterCount() > 0 &&
+              ` (已选${getActiveFilterCount()}项)`
             }
           </Text>
           <Button className={styles.filterToggleBtn}>
@@ -251,7 +414,7 @@ const SearchPage: React.FC = () => {
         </View>
 
         {showFilters && (
-          <View>
+          <View className={styles.advancedFilters}>
             <FilterBar
               label='预算范围'
               options={budgetOptions}
@@ -285,7 +448,6 @@ const SearchPage: React.FC = () => {
             <Button
               className={styles.resetBtn}
               onClick={handleResetFilters}
-              style={{ width: '100%', height: '80rpx', borderRadius: '48rpx', background: '#f5f6f7', color: '#4e5969', fontSize: '28rpx', marginBottom: '24rpx' }}
             >
               重置筛选
             </Button>
@@ -293,17 +455,34 @@ const SearchPage: React.FC = () => {
         )}
 
         <View className={styles.flavorSection}>
-          <Text style={{ fontSize: '30rpx', fontWeight: '500', color: '#1d2129', marginBottom: '16rpx', display: 'block' }}>
-            按风味选择
-          </Text>
+          <View className={styles.flavorTabs}>
+            <Button
+              className={classnames(styles.flavorTab, activeFlavorTab === 'aroma' && styles.activeFlavorTab)}
+              onClick={() => setActiveFlavorTab('aroma')}
+            >
+              香气
+            </Button>
+            <Button
+              className={classnames(styles.flavorTab, activeFlavorTab === 'taste' && styles.activeFlavorTab)}
+              onClick={() => setActiveFlavorTab('taste')}
+            >
+              口感
+            </Button>
+            <Button
+              className={classnames(styles.flavorTab, activeFlavorTab === 'style' && styles.activeFlavorTab)}
+              onClick={() => setActiveFlavorTab('style')}
+            >
+              风格
+            </Button>
+          </View>
           <ScrollView className={styles.flavorScroll} scrollX>
             <View className={styles.flavorTags}>
-              {aromaFlavors.map(flavor => (
+              {getCurrentFlavorList().map(flavor => (
                 <FlavorTag
                   key={flavor.id}
                   name={flavor.name}
-                  active={selectedFlavors.includes(flavor.name)}
-                  onClick={() => handleFlavorClick(flavor.name)}
+                  active={isFlavorSelected(flavor.name)}
+                  onClick={() => handleFlavorClick(flavor.name, activeFlavorTab)}
                 />
               ))}
             </View>
@@ -321,7 +500,7 @@ const SearchPage: React.FC = () => {
             <View className={styles.emptyState}>
               <Text className={styles.emptyIcon}>🍷</Text>
               <Text className={styles.emptyText}>没有找到符合条件的酒款</Text>
-              <Text className={styles.emptyText} style={{ fontSize: '24rpx', marginTop: '8rpx' }}>
+              <Text className={styles.emptySubText}>
                 试试调整筛选条件吧
               </Text>
             </View>

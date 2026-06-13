@@ -4,6 +4,7 @@ export default defineAppConfig({
     'pages/search/index',
     'pages/pairing/index',
     'pages/favorite/index',
+    'pages/gift/index',
     'pages/detail/index',
     'pages/compare/index',
     'pages/glossary/index',

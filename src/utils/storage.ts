@@ -3,7 +3,8 @@ import Taro from '@tarojs/taro';
 const STORAGE_KEYS = {
   FAVORITES: 'wine_favorites',
   RATING_NOTES: 'wine_rating_notes',
-  COMPARE_LIST: 'wine_compare_list'
+  COMPARE_LIST: 'wine_compare_list',
+  SEARCH_FILTERS: 'wine_search_filters'
 };
 
 export const getStorage = <T>(key: string, defaultValue: T): T => {

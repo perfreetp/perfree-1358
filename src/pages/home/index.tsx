@@ -6,8 +6,10 @@ import { categories } from '@/data/categories';
 import { wines } from '@/data/wines';
 import CategoryCard from '@/components/CategoryCard';
 import SectionHeader from '@/components/SectionHeader';
+import { useWineStore } from '@/store/WineContext';
 
 const HomePage: React.FC = () => {
+  const { setQuickFilter } = useWineStore();
   const [hotWines, setHotWines] = useState(wines.slice(0, 6));
 
   useEffect(() => {
@@ -51,6 +53,7 @@ const HomePage: React.FC = () => {
 
   const handleQuickFilter = (type: string, value: string) => {
     console.log('[HomePage] Quick filter:', type, value);
+    setQuickFilter(type, value);
     Taro.switchTab({
       url: '/pages/search/index'
     });
@@ -59,6 +62,11 @@ const HomePage: React.FC = () => {
   const handleKnowledgeClick = (path: string) => {
     console.log('[HomePage] Navigating to knowledge:', path);
     Taro.navigateTo({ url: path });
+  };
+
+  const handleGiftRecommend = () => {
+    console.log('[HomePage] Navigating to gift recommend');
+    Taro.navigateTo({ url: '/pages/gift/index' });
   };
 
   const quickItems = [
@@ -89,6 +97,14 @@ const HomePage: React.FC = () => {
       </View>
 
       <View className={styles.content}>
+        <View className={styles.giftBanner} onClick={handleGiftRecommend}>
+          <View className={styles.giftBannerContent}>
+            <Text className={styles.giftBannerTitle}>🎁 智能送礼推荐</Text>
+            <Text className={styles.giftBannerDesc}>预算 · 对象 · 场合，一键找到合适的酒</Text>
+          </View>
+          <Text className={styles.giftBannerArrow}>→</Text>
+        </View>
+
         <SectionHeader title='酒类分类' />
         <View className={styles.categoryGrid}>
           {categories.map(category => (

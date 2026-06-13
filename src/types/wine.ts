@@ -78,10 +78,30 @@ export interface RatingNote {
   createdAt: string;
 }
 
+export interface SearchFilters {
+  keyword: string;
+  category: string;
+  budgets: string[];
+  sweetness: string[];
+  occasions: string[];
+  foods: string[];
+  people: string[];
+  flavors: string[];
+  tasteTags: string[];
+  styleTags: string[];
+}
+
+export interface GiftFilters {
+  budget?: string;
+  recipient?: string;
+  occasion?: string;
+}
+
 export interface WineStore {
   favorites: string[];
   ratingNotes: RatingNote[];
   compareList: string[];
+  searchFilters: SearchFilters;
   toggleFavorite: (wineId: string) => void;
   isFavorite: (wineId: string) => boolean;
   addRating: (note: RatingNote) => void;
@@ -89,4 +109,7 @@ export interface WineStore {
   toggleCompare: (wineId: string) => void;
   isInCompare: (wineId: string) => boolean;
   clearCompare: () => void;
+  setSearchFilters: (filters: Partial<SearchFilters>) => void;
+  resetSearchFilters: () => void;
+  setQuickFilter: (type: string, value: string) => void;
 }

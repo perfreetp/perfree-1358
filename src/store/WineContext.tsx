@@ -1,6 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { WineStore, RatingNote } from '@/types/wine';
+import { WineStore, RatingNote, SearchFilters } from '@/types/wine';
 import { getStorage, setStorage, STORAGE_KEYS } from '@/utils/storage';
+import { occasionOptions, peopleOptions } from '@/data/flavors';
+
+const defaultSearchFilters: SearchFilters = {
+  keyword: '',
+  category: 'all',
+  budgets: [],
+  sweetness: [],
+  occasions: [],
+  foods: [],
+  people: [],
+  flavors: [],
+  tasteTags: [],
+  styleTags: []
+};
 
 const WineContext = createContext<WineStore | undefined>(undefined);
 
@@ -14,6 +28,9 @@ export const WineProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [compareList, setCompareList] = useState<string[]>(() =>
     getStorage<string[]>(STORAGE_KEYS.COMPARE_LIST, [])
   );
+  const [searchFilters, setSearchFiltersState] = useState<SearchFilters>(() =>
+    getStorage<SearchFilters>(STORAGE_KEYS.SEARCH_FILTERS, defaultSearchFilters)
+  );
 
   useEffect(() => {
     setStorage(STORAGE_KEYS.FAVORITES, favorites);
@@ -26,6 +43,10 @@ export const WineProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     setStorage(STORAGE_KEYS.COMPARE_LIST, compareList);
   }, [compareList]);
+
+  useEffect(() => {
+    setStorage(STORAGE_KEYS.SEARCH_FILTERS, searchFilters);
+  }, [searchFilters]);
 
   const toggleFavorite = (wineId: string) => {
     setFavorites(prev => {
@@ -76,17 +97,56 @@ export const WineProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCompareList([]);
   };
 
+  const setSearchFilters = (filters: Partial<SearchFilters>) => {
+    setSearchFiltersState(prev => ({
+      ...prev,
+      ...filters
+    }));
+  };
+
+  const resetSearchFilters = () => {
+    setSearchFiltersState(defaultSearchFilters);
+  };
+
+  const setQuickFilter = (type: string, value: string) => {
+    console.log('[WineContext] setQuickFilter:', type, value);
+    let newFilters: Partial<SearchFilters> = {};
+    
+    if (type === 'category') {
+      newFilters = { category: value };
+    } else if (type === 'occasion') {
+      const occasion = occasionOptions.find(o => o.name === value);
+      if (occasion) {
+        newFilters = { occasions: [occasion.id] };
+      }
+    } else if (type === 'people') {
+      const people = peopleOptions.find(p => p.name === value);
+      if (people) {
+        newFilters = { people: [people.id] };
+      }
+    }
+
+    setSearchFiltersState(prev => ({
+      ...prev,
+      ...newFilters
+    }));
+  };
+
   const value: WineStore = {
     favorites,
     ratingNotes,
     compareList,
+    searchFilters,
     toggleFavorite,
     isFavorite,
     addRating,
     getRating,
     toggleCompare,
     isInCompare,
-    clearCompare
+    clearCompare,
+    setSearchFilters,
+    resetSearchFilters,
+    setQuickFilter
   };
 
   return (
