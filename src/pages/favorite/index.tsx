@@ -37,7 +37,8 @@ const FavoritePage: React.FC = () => {
 
   useShareAppMessage(() => {
     const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
-    const shareText = generateShareText(wines);
+    const type = exportSource === 'favorites' ? 'single' : 'compare';
+    const shareText = generateShareText(wines, type);
     return {
       title: shareText.title,
       path: '/pages/favorite/index'
@@ -60,7 +61,7 @@ const FavoritePage: React.FC = () => {
     setCompareTotalPrice(total);
   };
 
-  const generateShareText = (wines: Wine[], type: 'single' | 'set' = 'single') => {
+  const generateShareText = (wines: Wine[], type: 'single' | 'compare' = 'single') => {
     if (wines.length === 0) {
       return {
         title: '酒识百科 - 我的酒单',
@@ -68,19 +69,51 @@ const FavoritePage: React.FC = () => {
       };
     }
     const total = wines.reduce((sum, w) => sum + w.price, 0);
-    const label = type === 'set' ? '【成套推荐】' : '【单瓶精选】';
+    
+    const allPeople: Record<string, number> = {};
+    const allOccasions: Record<string, number> = {};
+    wines.forEach(w => {
+      w.suitableFor.forEach(p => { allPeople[p] = (allPeople[p] || 0) + 1; });
+      w.occasions.forEach(o => { allOccasions[o] = (allOccasions[o] || 0) + 1; });
+    });
+    const topPeople = Object.entries(allPeople).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const topOccasions = Object.entries(allOccasions).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    
+    const label = type === 'compare' ? '【对比清单】' : '【单瓶精选】';
+    const titlePrefix = type === 'compare' ? '对比' : '精选';
     
     const lines = wines.map((w, i) => {
       const forPeople = w.suitableFor.slice(0, 2).join('、');
       const occasions = w.occasions.slice(0, 2).join('、');
       return `${i + 1}. ${w.name}\n   💰 ¥${w.price} / 瓶\n   👥 适合: ${forPeople}\n   🎉 场合: ${occasions}`;
     }).join('\n\n');
+
+    const summaryParts: string[] = [];
+    if (topPeople) summaryParts.push(`适合${topPeople}等人群`);
+    if (topOccasions) summaryParts.push(`${topOccasions}等场合`);
+    const summaryLine = summaryParts.length > 0 ? `\n💡 ${summaryParts.join('，')}` : '';
     
-    const content = `🍷 ${label} 我的酒单推荐\n\n${lines}\n\n━━━━━━━━━━━━━\n共${wines.length}款，合计 ¥${total}\n\n—— 来自「酒识百科」`;
+    const content = `🍷 ${label} 我的酒单推荐\n\n${lines}\n\n━━━━━━━━━━━━━${summaryLine}\n共${wines.length}款，合计 ¥${total}\n\n—— 来自「酒识百科」`;
     return {
-      title: `精选${wines.length}款好酒推荐，合计¥${total}`,
+      title: `${titlePrefix}${wines.length}款好酒，合计¥${total}`,
       content
     };
+  };
+
+  const getListSummary = (wines: Wine[]): string => {
+    if (wines.length === 0) return '';
+    const allPeople: Record<string, number> = {};
+    const allOccasions: Record<string, number> = {};
+    wines.forEach(w => {
+      w.suitableFor.forEach(p => { allPeople[p] = (allPeople[p] || 0) + 1; });
+      w.occasions.forEach(o => { allOccasions[o] = (allOccasions[o] || 0) + 1; });
+    });
+    const topPeople = Object.entries(allPeople).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const topOccasions = Object.entries(allOccasions).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const parts: string[] = [];
+    if (topPeople) parts.push(`适合${topPeople}等人群`);
+    if (topOccasions) parts.push(`${topOccasions}等场合`);
+    return parts.length > 0 ? parts.join('，') : '';
   };
 
   const handleCompareClick = () => {
@@ -107,7 +140,8 @@ const FavoritePage: React.FC = () => {
 
   const handleCopyText = () => {
     const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
-    const { content } = generateShareText(wines);
+    const type = exportSource === 'favorites' ? 'single' : 'compare';
+    const { content } = generateShareText(wines, type);
     Taro.setClipboardData({
       data: content,
       success: () => {
@@ -118,7 +152,8 @@ const FavoritePage: React.FC = () => {
 
   const handleShareText = () => {
     const wines = exportSource === 'favorites' ? favoriteWines : compareWines;
-    const { content } = generateShareText(wines);
+    const type = exportSource === 'favorites' ? 'single' : 'compare';
+    const { content } = generateShareText(wines, type);
     Taro.showModal({
       title: '分享文案',
       content,
@@ -349,6 +384,13 @@ const FavoritePage: React.FC = () => {
                   </View>
                 ))}
               </View>
+
+              {getListSummary(currentWines) && (
+                <View className={styles.giftCardSummary}>
+                  <Text className={styles.giftCardSummaryIcon}>💡</Text>
+                  <Text className={styles.giftCardSummaryText}>{getListSummary(currentWines)}</Text>
+                </View>
+              )}
 
               <View className={styles.giftCardFooter}>
                 <View className={styles.giftCardTotal}>

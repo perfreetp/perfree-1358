@@ -39,17 +39,47 @@ const ComparePage: React.FC = () => {
     }
     const total = wines.reduce((sum, w) => sum + w.price, 0);
     
+    const allPeople: Record<string, number> = {};
+    const allOccasions: Record<string, number> = {};
+    wines.forEach(w => {
+      w.suitableFor.forEach(p => { allPeople[p] = (allPeople[p] || 0) + 1; });
+      w.occasions.forEach(o => { allOccasions[o] = (allOccasions[o] || 0) + 1; });
+    });
+    const topPeople = Object.entries(allPeople).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const topOccasions = Object.entries(allOccasions).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    
     const lines = wines.map((w, i) => {
       const forPeople = w.suitableFor.slice(0, 2).join('、');
       const occasions = w.occasions.slice(0, 2).join('、');
       return `${i + 1}. ${w.name}\n   💰 ¥${w.price} / 瓶\n   👥 适合: ${forPeople}\n   🎉 场合: ${occasions}`;
     }).join('\n\n');
-    
-    const content = `📊 【对比清单】我的酒单对比\n\n${lines}\n\n━━━━━━━━━━━━━\n共${wines.length}款，合计 ¥${total}\n\n—— 来自「酒识百科」`;
+
+    const summaryParts: string[] = [];
+    if (topPeople) summaryParts.push(`适合${topPeople}等人群`);
+    if (topOccasions) summaryParts.push(`${topOccasions}等场合`);
+    const summaryLine = summaryParts.length > 0 ? `\n💡 ${summaryParts.join('，')}` : '';
+
+    const content = `📊 【对比清单】我的酒单对比\n\n${lines}\n\n━━━━━━━━━━━━━${summaryLine}\n共${wines.length}款，合计 ¥${total}\n\n—— 来自「酒识百科」`;
     return {
       title: `对比${wines.length}款好酒，合计¥${total}`,
       content
     };
+  };
+
+  const getCompareSummary = (wines: Wine[]): string => {
+    if (wines.length === 0) return '';
+    const allPeople: Record<string, number> = {};
+    const allOccasions: Record<string, number> = {};
+    wines.forEach(w => {
+      w.suitableFor.forEach(p => { allPeople[p] = (allPeople[p] || 0) + 1; });
+      w.occasions.forEach(o => { allOccasions[o] = (allOccasions[o] || 0) + 1; });
+    });
+    const topPeople = Object.entries(allPeople).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const topOccasions = Object.entries(allOccasions).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([n]) => n).join('、');
+    const parts: string[] = [];
+    if (topPeople) parts.push(`适合${topPeople}等人群`);
+    if (topOccasions) parts.push(`${topOccasions}等场合`);
+    return parts.length > 0 ? parts.join('，') : '';
   };
 
   const handleRemove = (wineId: string) => {
@@ -341,6 +371,13 @@ const ComparePage: React.FC = () => {
                   </View>
                 ))}
               </View>
+
+              {getCompareSummary(compareWines) && (
+                <View className={styles.giftCardSummary}>
+                  <Text className={styles.giftCardSummaryIcon}>💡</Text>
+                  <Text className={styles.giftCardSummaryText}>{getCompareSummary(compareWines)}</Text>
+                </View>
+              )}
 
               <View className={styles.giftCardFooter}>
                 <View className={styles.giftCardTotal}>

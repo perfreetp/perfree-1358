@@ -320,6 +320,29 @@ $text-secondary: #6B6B6B;
   }
 }
 
+.comboSummary {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  background: #FFFBF0;
+  border-radius: 16px;
+  margin-bottom: 20px;
+
+  .summaryIcon {
+    font-size: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .summaryText {
+    font-size: 26px;
+    color: #8B6914;
+    line-height: 1.6;
+    flex: 1;
+  }
+}
+
 .comboAnalysis {
   display: flex;
   flex-direction: column;
@@ -437,13 +460,37 @@ $text-secondary: #6B6B6B;
   color: $primary-color;
 }
 
-.replaceBtn {
-  font-size: 24px;
+.wineActions {
+  display: flex;
+  gap: 8px;
+}
+
+.wineActionBtn {
+  font-size: 22px;
   color: $primary-color;
   background: #FFF5F5;
   border: 2px solid $primary-color;
   border-radius: 24px;
-  padding: 6px 16px;
+  padding: 6px 14px;
+  font-weight: 500;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.wineActionActive {
+  background: $primary-color;
+  color: white;
+}
+
+.replaceBtn {
+  font-size: 22px;
+  color: $secondary-color;
+  background: #FFFBF0;
+  border: 2px solid $secondary-color;
+  border-radius: 24px;
+  padding: 6px 14px;
   font-weight: 500;
 
   &:active {
@@ -474,15 +521,27 @@ $text-secondary: #6B6B6B;
 
   .comboActions {
     display: flex;
-    gap: 16px;
+    gap: 10px;
   }
 
   .actionBtn {
-    padding: 16px 28px;
+    padding: 14px 18px;
     border-radius: 32px;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 600;
     border: none;
+  }
+
+  .stageBtn {
+    background: #FFFBF0;
+    color: #8B6914;
+    border: 2px solid $secondary-color;
+  }
+
+  .stagedBtn {
+    background: $secondary-color;
+    color: white;
+    border-color: $secondary-color;
   }
 
   .favBtn {
@@ -492,8 +551,164 @@ $text-secondary: #6B6B6B;
   }
 
   .compareBtn {
+    background: #F0F5FF;
+    color: #1A56DB;
+    border: 2px solid #1A56DB;
+  }
+
+  .shareBtn {
     background: linear-gradient(135deg, $primary-color, #A52A2A);
     color: white;
+  }
+}
+
+.stagedSection {
+  background: $card-bg;
+  border-radius: 28px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.stagedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.stagedTitle {
+  font-size: 32px;
+  font-weight: bold;
+  color: $text-primary;
+}
+
+.stagedToggle {
+  font-size: 26px;
+  color: $primary-color;
+  background: #FFF5F5;
+  border: none;
+  border-radius: 24px;
+  padding: 8px 24px;
+  font-weight: 500;
+}
+
+.stagedList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.stagedCard {
+  background: #FAF7F2;
+  border-radius: 20px;
+  padding: 24px;
+  border: 2px solid #E8E0D4;
+}
+
+.stagedCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stagedCardBadge {
+  display: inline-flex;
+  padding: 4px 16px;
+  border-radius: 24px;
+  font-size: 22px;
+  font-weight: 600;
+  background: linear-gradient(135deg, $secondary-color, #B8960C);
+  color: white;
+}
+
+.stagedCardName {
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-primary;
+  flex: 1;
+}
+
+.stagedRemoveBtn {
+  font-size: 28px;
+  color: #CCC;
+  background: transparent;
+  border: none;
+  padding: 4px 8px;
+
+  &:active {
+    color: $primary-color;
+  }
+}
+
+.stagedCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stagedWineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stagedWineName {
+  font-size: 24px;
+  color: $text-secondary;
+  background: white;
+  padding: 4px 16px;
+  border-radius: 16px;
+}
+
+.stagedInfo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stagedTotal {
+  font-size: 30px;
+  font-weight: bold;
+  color: $primary-color;
+}
+
+.stagedTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stagedTag {
+  font-size: 22px;
+  color: $secondary-color;
+  background: rgba(212, 175, 55, 0.12);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.stagedCardActions {
+  display: flex;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 2px dashed #E8E0D4;
+}
+
+.stagedActionBtn {
+  flex: 1;
+  font-size: 24px;
+  color: $primary-color;
+  background: white;
+  border: 2px solid #E8E0D4;
+  border-radius: 24px;
+  padding: 10px 0;
+  text-align: center;
+  font-weight: 500;
+
+  &:active {
+    background: #FFF5F5;
   }
 }
 
@@ -665,4 +880,319 @@ $text-secondary: #6B6B6B;
   background: #F0EBE3;
   color: $text-primary;
   border: none;
+}
+
+.exportModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $page-padding;
+}
+
+.exportContent {
+  background-color: $card-bg;
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 650rpx;
+}
+
+.exportTitle {
+  font-size: 36px;
+  font-weight: bold;
+  color: $text-primary;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.exportSubtitle {
+  font-size: 26px;
+  color: $text-secondary;
+  text-align: center;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+.exportOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.exportOption {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background-color: #FAF7F2;
+  border-radius: 20px;
+  text-align: left;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.exportOptionIcon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #A52A2A, $primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  flex-shrink: 0;
+}
+
+.exportOptionInfo {
+  flex: 1;
+}
+
+.exportOptionTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: $text-primary;
+  display: block;
+}
+
+.exportOptionDesc {
+  font-size: 24px;
+  color: $text-secondary;
+  margin-top: 4px;
+  display: block;
+}
+
+.exportBtn {
+  width: 100%;
+  height: 88px;
+  border-radius: 44px;
+  font-size: 30px;
+  font-weight: 600;
+  border: none;
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.cancelBtn {
+  background-color: #F0EBE3;
+  color: $text-primary;
+}
+
+.confirmBtn {
+  background: linear-gradient(135deg, $primary-color, #A52A2A);
+  color: white;
+}
+
+.cardScroll {
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.cardActions {
+  display: flex;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.giftCard {
+  background: linear-gradient(180deg, #FFF8F0 0%, #FFFFFF 100%);
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.15);
+}
+
+.giftCardHeader {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 2rpx dashed #E8E0D4;
+  margin-bottom: 20px;
+}
+
+.giftCardBadge {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  background: linear-gradient(135deg, $secondary-color, #B8960C);
+  color: white;
+  font-size: 24rpx;
+  font-weight: 600;
+  border-radius: 32rpx;
+  margin-bottom: 12rpx;
+}
+
+.giftCardTitle {
+  font-size: 36px;
+  font-weight: bold;
+  color: $primary-color;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.giftCardSubtitle {
+  font-size: 24px;
+  color: $text-secondary;
+}
+
+.giftCardContext {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.giftCardContextTag {
+  font-size: 24px;
+  color: white;
+  background: linear-gradient(135deg, $primary-color, #A52A2A);
+  padding: 6px 20px;
+  border-radius: 24px;
+  font-weight: 500;
+}
+
+.giftCardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.giftCardItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: white;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.giftCardIndex {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, $secondary-color, #B8960C);
+  color: white;
+  font-size: 22rpx;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.giftCardImage {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 12rpx;
+  background-color: #F5F0E8;
+  flex-shrink: 0;
+}
+
+.giftCardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.giftCardName {
+  font-size: 26px;
+  font-weight: 600;
+  color: $text-primary;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.giftCardDesc {
+  font-size: 22px;
+  color: $text-secondary;
+  margin-top: 2rpx;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.giftCardTags {
+  margin-top: 8rpx;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6rpx;
+}
+
+.giftCardTag {
+  font-size: 20rpx;
+  color: #8B6914;
+  background-color: rgba(212, 175, 55, 0.12);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  white-space: nowrap;
+}
+
+.giftCardPrice {
+  font-size: 28px;
+  font-weight: bold;
+  color: $primary-color;
+  flex-shrink: 0;
+}
+
+.giftCardSummary {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 20px;
+  padding: 16px;
+  background: #FFFBF0;
+  border-radius: 12px;
+}
+
+.giftCardSummaryIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.giftCardSummaryText {
+  font-size: 24px;
+  color: #8B6914;
+  line-height: 1.5;
+  flex: 1;
+}
+
+.giftCardFooter {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 2rpx dashed #E8E0D4;
+}
+
+.giftCardTotal {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.giftCardTotalLabel {
+  font-size: 26px;
+  color: $text-secondary;
+}
+
+.giftCardTotalPrice {
+  font-size: 40px;
+  font-weight: bold;
+  color: $primary-color;
+}
+
+.giftCardSlogan {
+  font-size: 22px;
+  color: $text-secondary;
+  text-align: center;
 }

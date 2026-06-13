@@ -466,3 +466,25 @@
   color: $color-text-tertiary;
   font-style: italic;
 }
+
+.giftCardSummary {
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+  margin-top: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: rgba(212, 175, 55, 0.08);
+  border-radius: $radius-md;
+}
+
+.giftCardSummaryIcon {
+  font-size: 28rpx;
+  flex-shrink: 0;
+}
+
+.giftCardSummaryText {
+  font-size: $font-size-xs;
+  color: $color-secondary-dark;
+  line-height: 1.6;
+  flex: 1;
+}
